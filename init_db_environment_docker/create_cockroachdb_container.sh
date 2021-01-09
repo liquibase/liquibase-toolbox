@@ -10,6 +10,5 @@ docker exec -it $containerName ./cockroach init --insecure
 echo creating dev, test and prod databases.  Please wait...
 sleep 10
 #docker exec -it roach ./cockroach sql --insecure
-cd ~/CLI-Projects/CockroachDB
-liquibase --url=jdbc:postgresql://localhost:26257/postgres executeSql --sql="CREATE DATABASE dev;CREATE DATABASE test;CREATE DATABASE prod;"
+liquibase --url=jdbc:postgresql://localhost:26257/postgres --username=root --password=password --classpath=../print_driver_name/postgresql-42.2.8.jar executeSql --sql="CREATE DATABASE dev;CREATE DATABASE test;CREATE DATABASE prod;"
 
