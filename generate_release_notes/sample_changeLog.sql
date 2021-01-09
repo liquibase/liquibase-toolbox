@@ -24,7 +24,7 @@ CREATE TABLE colors (
 );
 --rollback drop table colors;
  
---changeset BenG:45679-insertcolors
+--changeset ChristineM:45679-insertcolors
 --comment: dml for table "colors" for feature "BCD"
 INSERT INTO colors (bcolor, fcolor)
 VALUES
