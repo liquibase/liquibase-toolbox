@@ -1,0 +1,48 @@
+---
+- name: Install Liquibase
+  hosts: lbservers
+  tasks:
+    - name: download Liquibase
+      shell: |
+        mkdir ~/liquibase_temp
+        cd ~/liquibase_temp
+        curl -L https://github.com/liquibase/liquibase/releases/download/v{{ VERSION }}/liquibase-{{ VERSION }}.tar.gz --output liquibase-{{ VERSION }}.tar.gz
+        tar xvfz liquibase-{{ VERSION }}.tar.gz
+      vars:
+        VERSION: "4.3.1"
+      register: shell_output
+    - debug: var=shell_output
+        
+    - name: Run Liquibase from a temp Liquibase installation
+      shell: |  
+        ./liquibase_temp/liquibase --version
+        rm -rf ~/liquibase_temp
+      args:
+        chdir: $HOME
+      register: shell_output
+    - debug: var=shell_output
+    
+    - name: Run Liquibase from a permanent Liquibase installation (assuming Liquibase was pre installed in /root/liquibase)
+      shell: |  
+        liquibase --version
+      args:
+        chdir: $HOME
+      environment:
+        PATH: "/root/liquibase:{{ ansible_env.PATH }}"
+      register: shell_output
+    - debug: var=shell_output
+    
+    - name: Run Liquibase from Liquibase docker image
+      shell: |  
+        mkdir ./docker_changelogs
+        echo -e "-- liquibase formatted sql\n\n-- changeset Tsvi:123\nCREATE TABLE CUSTOMER (ID INT NOT NULL, NAME VARCHAR(50) NOT NULL, AGE INT, LASTNAME VARCHAR(50) NOT NULL, YEAR INT NOT NULL, CONSTRAINT PK_CUSTOMER PRIMARY KEY (ID, YEAR));\n--rollback DROP TABLE CUSTOMER;" > ./docker_changelogs/changeLog.h2.sql
+        docker run --rm -v /root/docker_changelogs/:/liquibase/changelog:Z liquibase/liquibase:{{ VERSION }} --changeLogFile=changelog/changeLog.h2.sql --url=jdbc:h2:mem:liquibase_dev --username=admin --password=password status --verbose
+        rm -rf docker_changelogs
+        docker rmi liquibase/liquibase:{{ VERSION }}
+      vars:
+        VERSION: "latest"
+      args:
+        chdir: $HOME
+      register: shell_output
+    - debug: var=shell_output
+    
