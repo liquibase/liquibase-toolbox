@@ -6,10 +6,10 @@ pipeline {
 agent any
   environment {
     PROJ="<project_name>"
-  	GITURL="https://github.com/<username>"
-  	ENVIRONMENT_STEP="${params.step}"
+    GITURL="https://github.com/<username>"
+    ENVIRONMENT_STEP="${params.step}"
     BRANCH="${params.pipeline}"
-	PATH="C:\\Program Files\\liquibase;${env.PATH}"
+    PATH="C:\\Program Files\\liquibase;${env.PATH}"
   }
   stages {
 
@@ -19,7 +19,7 @@ agent any
         echo "Current project: "%PROJ%
         echo "Current scm branch: "%BRANCH%
         echo "Current environment: "%ENVIRONMENT_STEP%
-	    echo "Current PATH: "%PATH%
+	echo "Current PATH: "%PATH%
 			'''
 		} // steps
 	} // stage 'precheck'
