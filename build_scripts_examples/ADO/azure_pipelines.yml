@@ -1,0 +1,54 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- none
+
+pool:
+  name: 'Default'
+
+variables:
+  appname: MyApp
+  version: $(Build.BuildId)
+
+steps:
+
+- script: |
+    whoami
+    echo $(System.DefaultWorkingDirectory)
+    ./liquibase --version
+  displayName: 'Run Prechecks'
+
+- script: |
+    echo "Using liquibase updateSQL command"
+    call ./liquibase --defaultsFile=DEV/liquibase.properties updateSQL
+  displayName: 'Running Liquibase updateSQL command' 
+
+- script: |
+    echo "Using liquibase update command"
+    call ./liquibase --defaultsFile=DEV/liquibase.properties update
+  displayName: 'Running Liquibase update command'
+
+- script: |
+    echo "Using liquibase rollbackCount command"
+    call ./liquibase --defaultsFile=DEV/liquibase.properties rollbackCount 1
+  displayName: 'Running Liquibase rollback command'
+
+
+- script: |
+    cd DEV
+    echo "Zip Files"
+    zip -q -r $(appname)-$(Build.BuildId).zip *
+    cp *.zip ..
+  displayName: 'Zipping Artifact'
+
+- script: |
+    mkdir $(System.DefaultWorkingDirectory)\artifacts
+    cp $(appname)-$(Build.BuildId).zip $(System.DefaultWorkingDirectory)\artifacts
+  displayName: 'Copy zip to Azure Artifacts'
+
+
+- upload: $(System.DefaultWorkingDirectory)\artifacts\$(appname)-$(Build.BuildId).zip
+  artifact: LB_App
