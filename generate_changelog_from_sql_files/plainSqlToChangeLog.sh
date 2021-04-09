@@ -16,8 +16,8 @@ find $1 -type f \( -iname "*.sql" ! -iname $changelogFile \) -print |sort -n| wh
     echo -e "\n-- rollback \n"
 done >> $changelogFile
 
-liquibase status --verbose
-liquibase update
-liquibase --changeLogFile=sample_changeLog.xml generateChangeLog
-liquibase --changeLogFile=sample_changeLog.json generateChangeLog
-liquibase --changeLogFile=sample_changeLog.yaml generateChangeLog
+#liquibase status --verbose
+#liquibase update
+#liquibase --changeLogFile=sample_changeLog.xml generateChangeLog
+#liquibase --changeLogFile=sample_changeLog.json generateChangeLog
+#liquibase --changeLogFile=sample_changeLog.yaml generateChangeLog
