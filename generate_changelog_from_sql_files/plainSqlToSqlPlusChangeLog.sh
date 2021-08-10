@@ -1,4 +1,4 @@
-# ./plainSqlToChangeLog.sh /path/to/plain_sql/folder /path/to/new/generated/<changeLog Name>.sql
+# ./plainSqlToSqlPlusChangeLog.sh /path/to/plain_sql/folder /path/to/new/generated/<changeLog Name>.sql
 changelogFile="${2:-"sample_changeLog.sql"}"
 if [ -z "$1" ]
 then
@@ -12,7 +12,7 @@ i=0
 find $1 -type f \( -iname "*.sql" ! -iname $changelogFile \) -print |sort -n| while read filename; do
     i=$((i+1))
     filenameStripSlash=$(echo $filename | sed 's/\//\_/g')
-    printf '%s\n' "-- changeset "author"$i:${filenameStripSlash}"
+    printf '%s\n' "-- changeset "author"$i:${filenameStripSlash} runWith:sqlplus"
     cat "$filename"
     echo -e "\n-- rollback \n"
 done >> $changelogFile
