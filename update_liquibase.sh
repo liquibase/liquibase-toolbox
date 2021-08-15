@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 latest_version="$(curl -s https://github.com/liquibase/liquibase/releases/latest | grep -o "v.*" | sed s/'>.*'//g |  sed s/'v'//g | sed 's/"//g')"
 version="${1:-$latest_version}"
 if [ -z "$1" ]
@@ -19,7 +18,6 @@ while true; do
 done
 fi
 
-
 if curl -L https://github.com/liquibase/liquibase/releases/download/v${version}/liquibase-${version}.zip --output liquibase-${version}.zip ; 
 then
     unzip -o -d liquibase liquibase-${version}.zip
@@ -28,8 +26,6 @@ then
     echo "Running liquibase --version";tput sgr0
     liquibase --version
 else
-    cd ..
-    rm -rf ~/liquibase_temp
     tput setaf 2; echo "ERROR: Please make sure to specify the correct version in the following format [x.x.x]. 
 For example(latest version): ~/update_liquibase" $latest_version
     echo "To see available versions visit https://github.com/liquibase/liquibase/releases";tput sgr0
