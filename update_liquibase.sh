@@ -21,7 +21,6 @@ fi
 if curl --fail -L https://github.com/liquibase/liquibase/releases/download/v${version}/liquibase-${version}.zip --output liquibase-${version}.zip ; 
 then
     unzip -o -d liquibase liquibase-${version}.zip
-    rm -rf liquibase-${version}.zip
     tput setaf 2; echo "Liquibase is now updated to version $version"
     echo "Running liquibase --version";tput sgr0
     liquibase --version
