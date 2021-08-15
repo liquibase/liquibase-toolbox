@@ -18,7 +18,7 @@ while true; do
 done
 fi
 
-if curl -L https://github.com/liquibase/liquibase/releases/download/v${version}/liquibase-${version}.zip --output liquibase-${version}.zip ; 
+if curl --fail -L https://github.com/liquibase/liquibase/releases/download/v${version}/liquibase-${version}.zip --output liquibase-${version}.zip ; 
 then
     unzip -o -d liquibase liquibase-${version}.zip
     rm -rf liquibase-${version}.zip
