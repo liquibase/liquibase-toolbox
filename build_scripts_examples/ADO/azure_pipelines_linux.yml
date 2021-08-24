@@ -1,1 +1,55 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- none
+
+pool:
+  name: 'liquibase'
+
+variables:
+  appname: MyApp
+  version: $(Build.BuildId)
+
+steps:
+
+- script: |
+    whoami
+    . ~/env_var/exp_lb_env_vars_oracle.sh &>/dev/null
+    echo $(System.DefaultWorkingDirectory)
+    liquibase --version
+    liquibase --changeLogFile=oracle_changelog.sql validate
+    liquibase --changeLogFile=oracle_changelog.sql updateSQL
+  displayName: 'Run Prechecks'
+
+- script: |
+    . ~/env_var/exp_lb_env_vars_oracle.sh &>/dev/null
+    liquibase --changeLogFile=oracle_changelog.sql update
+    liquibase --changeLogFile=oracle_changelog.sql rollbackOneUpdate --force
+    liquibase --changeLogFile=oracle_changelog.sql update
+    liquibase --changeLogFile=oracle_changelog.sql history
+  displayName: 'Running Liquibase in DEV environment'
+
+- script: |
+    . ~/env_var/exp_lb_env_vars_oracle_diff.sh &>/dev/null
+    liquibase diff
+  displayName: 'Running quality checks between DEV --> TEST environments'
+
+
+- script: |
+    echo "Zipping Files"
+    zip -q -r $(appname)-$(Build.BuildId).zip *
+  displayName: 'Zipping Artifact'
+
+- script: |
+    mkdir $(System.DefaultWorkingDirectory)\artifacts
+    copy "$(appname)-$(Build.BuildId).zip" "$(System.DefaultWorkingDirectory)\artifacts"
+  displayName: 'Copy zip to Azure Artifacts'
+
+
+- upload: $(System.DefaultWorkingDirectory)\artifacts\$(appname)-$(Build.BuildId).zip
+  artifact: MyApp
+
 
