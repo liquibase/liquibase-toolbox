@@ -7,7 +7,7 @@ trigger:
 - none
 
 pool:
-  name: 'Default'
+  name: 'liquibase'
 
 variables:
   appname: MyApp
@@ -17,24 +17,25 @@ steps:
 
 - script: |
     whoami
+    call C:\agent\setupLBDEV.bat > NUL
     echo $(System.DefaultWorkingDirectory)
-    liquibase --version
+    call liquibase --version
+    call liquibase --changeLogFile=oracle_changelog.sql validate
+    call liquibase --changeLogFile=oracle_changelog.sql updateSQL
   displayName: 'Run Prechecks'
 
 - script: |
-    echo "Using liquibase updateSQL command"
-    liquibase --url=$(URL) --username=$(USER_NAME) --password=$(PASSWORD) --classpath=path/to/driver/jdbc.jar --changeLogFile=changeLog.sql updateSQL
-  displayName: 'Running Liquibase updateSQL command' 
+    call C:\agent\setupLBDEV.bat > NUL
+    call liquibase --changeLogFile=oracle_changelog.sql update
+    call liquibase --changeLogFile=oracle_changelog.sql rollbackOneUpdate --force
+    call liquibase --changeLogFile=oracle_changelog.sql update
+    call liquibase --changeLogFile=oracle_changelog.sql history
+  displayName: 'Running Liquibase in DEV environment'
 
 - script: |
-    echo "Using liquibase update command"
-    liquibase --url=$(URL) --username=$(USER_NAME) --password=$(PASSWORD) --classpath=path/to/driver/jdbc.jar --changeLogFile=changeLog.sql update
-  displayName: 'Running Liquibase update command'
-
-- script: |
-    echo "Using liquibase rollbackCount command"
-    liquibase --url=$(URL) --username=$(USER_NAME) --password=$(PASSWORD) --classpath=path/to/driver/jdbc.jar --changeLogFile=changeLog.sql rollbackCount 3
-  displayName: 'Running Liquibase rollback command'
+    call C:\agent\setupLBDEV_Diff.bat > NUL
+    call liquibase diff
+  displayName: 'Running quality checks between DEV --> TEST environments'
 
 
 - script: |
