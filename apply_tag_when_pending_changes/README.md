@@ -5,10 +5,12 @@ Usage:
 CMD/Windows: 
 ```console
 call isUpToDate.bat [tag name parameter]
-
-Powershell/Windows: <br>
+```
+Powershell/Windows:
+```console
 .\isUpToDate.ps1 [tag name parameter]
-
-Bash/Linux: <br>
+```
+Bash/Linux:
+```console
 ./isUpToDate.sh [tag name parameter]
 ```
