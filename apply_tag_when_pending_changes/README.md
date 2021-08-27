@@ -2,7 +2,8 @@ To prevent tagging (liquibase tag &lt;tagname&gt;) to overwrite previous tags wh
 
 Usage:
 
-CMD/Windows: <br>
+CMD/Windows: 
+bat```
 call isUpToDate.bat [tag name parameter]
 
 Powershell/Windows: <br>
@@ -10,3 +11,4 @@ Powershell/Windows: <br>
 
 Bash/Linux: <br>
 ./isUpToDate.sh [tag name parameter]
+```
