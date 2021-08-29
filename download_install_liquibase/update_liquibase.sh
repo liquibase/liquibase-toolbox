@@ -18,12 +18,14 @@ while true; do
 done
 fi
 
+cd
+
 if curl --fail -L https://github.com/liquibase/liquibase/releases/download/v${version}/liquibase-${version}.zip --output liquibase-${version}.zip ; 
 then
     unzip -o -d liquibase liquibase-${version}.zip
     tput setaf 2; echo "Liquibase is now updated to version $version"
     echo "Running liquibase --version";tput sgr0
-    liquibase --version
+    ~/liquibase/liquibase --version
 else
     tput setaf 2; echo "ERROR: Please make sure to specify the correct version in the following format [x.x.x]. 
 For example(latest version): ~/update_liquibase" $latest_version
