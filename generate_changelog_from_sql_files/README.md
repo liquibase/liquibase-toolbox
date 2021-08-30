@@ -8,3 +8,5 @@ Or for Oracle SQL Plus SQL files
 ```script
 ./plainSqlToSqlPlusChangeLog.sh /path/to/plain_sql/folder /path/to/new/generated/<changeLog Name>.sql
 ```
+###Note
+To run the shell scripts on Windows, install GitBash for Windows or CygWin64
