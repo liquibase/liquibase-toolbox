@@ -28,3 +28,5 @@ Or for latest version no need to provide an argument.
 ```console
 ./update_liquibase.sh
 ```
+
+**Here are avaialble Liquibase versions** - https://github.com/liquibase/liquibase/releases
