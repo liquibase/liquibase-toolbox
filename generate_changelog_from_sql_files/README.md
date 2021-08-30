@@ -1,4 +1,4 @@
-This solution will help with situations where users need to take their existing SQL files and turn them into a formatted SQL changelog.
+This solution will help with situations where users need to take their existing SQL files and turn them into a Liquibase changelog.
 
 Usage:
 ```script
