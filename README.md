@@ -1,11 +1,13 @@
 # liquibase_toolbox
 This is repository contains Liquibase helper mini apps/scripts to help enhance the usage of Liquibase in some special scenarios.
 
-# Usage
+## Usage
 Each directory contains a specific tool with its README file with the necessary instructions and use-case description.
 
-# Notes
-All workflows are set to be running on a Ubuntu-latest VM Github hosted runner.
+## Run scenarios in GitHub Actions
+To test the various use-cases and GitHub Acions workflow was created.  Just fork the repository and run the scenario.
 
-# Adjustments/PRs
+## Adjustments/PRs
+Pool requests are more then welcome!  
 
+Thanks for any contributions :)
