@@ -4,7 +4,7 @@ This solution helps with creating a label changeset attribute to a specific exis
 ```console
 ./modifyChangeSet.sh /path/to/changelog.sql <labelName> <author>:<id>
 ```
-Example <br>
+**Example** <br>
 ```console
 ./modifyChangeSet.sh changeLog.sql Jira112 Tsvi:14c
 ```
