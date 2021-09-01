@@ -1,5 +1,5 @@
 # liquibase-toolbox
-This is repository contains Liquibase helper mini apps/scripts to help enhance the usage of Liquibase in some special scenarios.
+This repository contains Liquibase helper mini apps/scripts to help enhance the usage of Liquibase in some special scenarios.
 
 ## Usage
 Each directory contains a specific tool with its README file with the necessary instructions and use-case description.
