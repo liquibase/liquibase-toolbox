@@ -31,17 +31,6 @@ jobs:
           curl -L https://github.com/liquibase/liquibase/releases/download/v${LB_VERSION}/liquibase-${LB_VERSION}.zip --output liquibase-${LB_VERSION}.zip
           unzip -o -d liquibase liquibase-${LB_VERSION}.zip
           ./liquibase/liquibase --version
-
-      - run: | 
-          cd apply_tag_when_pending_changes
-          ./isUpToDate.sh version1
-          liquibase update
-          ./isUpToDate.sh version1
-          
-      - run: |
-          cd generate_changelog_from_sql_files
-          ./plainSqlToSqlPlusChangeLog.sh SampleSqlScripts changeLog.sql
-          cat changeLog.sql
             
           # Uncomment the line below to save changes.  Also, see environment variables under "env" and assign variables accordingly
           #git config --global user.email $user.email; git config --global user.name $user.name; git config pull.rebase false; git add .; git commit -m $"message"; git push -u origin $branch
