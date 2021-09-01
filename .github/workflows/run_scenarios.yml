@@ -31,11 +31,7 @@ jobs:
           curl -L https://github.com/liquibase/liquibase/releases/download/v${LB_VERSION}/liquibase-${LB_VERSION}.zip --output liquibase-${LB_VERSION}.zip
           unzip -o -d liquibase liquibase-${LB_VERSION}.zip
           ./liquibase/liquibase --version
-          cd apply_tag_when_pending_changes
-          ./isUpToDate.sh version1
-          liquibase update
-          ./isUpToDate.sh version1
-          cd ../generate_changelog_from_sql_files
+          cd generate_changelog_from_sql_files
           ./plainSqlToSqlPlusChangeLog.sh SampleSqlScripts changeLog.sql
           cat changeLog.sql
             
