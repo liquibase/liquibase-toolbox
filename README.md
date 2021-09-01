@@ -8,6 +8,6 @@ Each directory contains a specific tool with its README file with the necessary 
 To test the various use-cases and GitHub Acions workflow was created.  Just fork the repository and run the scenario.
 
 ## Adjustments/PRs
-Pool requests are more than welcome!  
+Pull requests are more than welcome!  
 
 Thanks for any contributions :)
