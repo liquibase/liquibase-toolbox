@@ -32,7 +32,10 @@ jobs:
           unzip -o -d liquibase liquibase-${LB_VERSION}.zip
           ./liquibase/liquibase --version
           cd generate_changelog_from_sql_files
+          echo "running the generate_changelog_from_sql_files scenario with runwith:sqlplus changeset attribute"
+          echo "./plainSqlToSqlPlusChangeLog.sh SampleSqlScripts changeLog.sql"
           ./plainSqlToSqlPlusChangeLog.sh SampleSqlScripts changeLog.sql
+          echo "Outputted changelog:"
           cat changeLog.sql
             
           # Uncomment the line below to save changes.  Also, see environment variables under "env" and assign variables accordingly
