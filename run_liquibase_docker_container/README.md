@@ -2,12 +2,13 @@ The **test_liquibase_docker_container.sh** script eases the experience using liq
 
 **Usage** <br>
 
-For optional parameters, you can try: 
+For optional parameters, you can try: <br>
 ```console
-/path/to/test_liquibase_docker_container.sh &lt;docker tag name&gt; &lt;path to changelog&gt; &lt;'liquibase flags'&gt; &lt;liquibase command&gt;
+/path/to/test_liquibase_docker_container.sh <docker tag name> <path to changelog> <'liquibase flags'> <liquibase command>
 For example: /path/to/test_liquibase_docker_container.sh latest ./CLI-Projects/H2/myChangeLog.xml '--url=jdbc:h2:file:./h2tutorial --username=admin --password=password' update
 ```
 
+For defaults file parameter, you can try: <br>
 ```console
 /path/to/test_liquibase_docker_container.sh latest ./CLI-Projects/H2/myChangeLog.xml --defaultsFile=changelog/liquibase.properties update
 ```
