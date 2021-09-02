@@ -6,7 +6,7 @@ It will download Liquibase latest version unless specified differently using an 
 
 **update_liquibase.sh**
 This script will download the Liquibase zip folder and unzip it in your home directory (~ path).
-It will download Liquibase latest version unless specified differently using an argument.
+It will download Liquibase latest version unless specified differently using an argument. <br>
 [ Warning ] - The script will replace/overwrite an existing 'liquibase' directory in the home directory. 
 
 Usage:
