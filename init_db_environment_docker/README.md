@@ -1,5 +1,5 @@
 This solution will potentially help when there is a need to spin up a database sandbox environment to evaluate Liquibase. <br>
-Each script will snip up a docker container from a publicaly available docker image from https://hub.docker.com/
+Each script will spin up a docker container from a publicaly available docker image from https://hub.docker.com/
 
 **Usage** <br>
 ```console
