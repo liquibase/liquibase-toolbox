@@ -1,0 +1,34 @@
+version: 0.2
+    
+env:
+  variables:
+    LIQUIBASE_COMMAND_URL: ""
+  secrets-manager:
+    LIQUIBASE_COMMAND_USERNAME: 
+    LIQUIBASE_COMMAND_PASSWORD: 
+    LIQUIBASE_PRO_LICENSE_KEY: codebuild/cs/liquibase/demo:LIQUIBASE_PRO_KEY
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto11
+  pre_build:
+    commands:
+      - liquibase --version
+  build:
+    commands:
+      - echo Build started on `date`
+      - liquibase --defaultsFile=liquibase.properties validate
+      - liquibase --defaultsFile=liquibase.properties tag codebuild-$CODEBUILD_BUILD_NUMBER
+      - liquibase --defaultsFile=liquibase.properties status --verbose
+      - liquibase --defaultsFile=liquibase.properties updateSql
+      - liquibase --defaultsFile=liquibase.properties update
+      - liquibase --defaultsFile=liquibase.properties history
+      
+  post_build:
+    commands:
+      - liquibase --defaultsFile=liquibase.properties --outputFile=codebuild-$CODEBUILD_BUILD_NUMBER.json snapshot --snapshotFormat=json
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - codebuild-$CODEBUILD_BUILD_NUMBER.json
