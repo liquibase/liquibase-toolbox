@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet author="SteveZ" id="1608" context="deployment_1B">
+        <tagDatabase tag="deployment_1B"/>
+    </changeSet>
+    <include file="1.1.0/1.1.0_ddl1.sql" relativeToChangelogFile="true"/>
+    <include file="1.1.0/1.1.0_proc1.sql" relativeToChangelogFile="true"/>
+
+    <changeSet author="SteveZ" id="1609" context="deployment_2B">
+        <tagDatabase tag="deployment_2B"/>
+    </changeSet>
+    <include file="1.1.0/1.1.0_ddl2.sql" relativeToChangelogFile="true"/>
+    <include file="1.1.0/1.1.0_proc2.sql" relativeToChangelogFile="true"/>
+
+    <changeSet author="SteveZ" id="1610" context="deployment_3B">
+        <tagDatabase tag="deployment_3B"/>
+    </changeSet>
+    <changeSet author="SteveZ" id="1611" context="deployment_3B" labels="feature13389,Jira-167" runOnChange="true">
+        <sqlFile path="1.1.0/1.1.0_sqlfile.sql" splitStatements="false" relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="1.1.0/1.1.0_sqlfile_rollback.sql" relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
