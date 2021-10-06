@@ -1,0 +1,23 @@
+databaseChangeLog:
+- changeSet:
+    id: 1577380964225-1
+    author: Administrator (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              primaryKey: true
+            name: id
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(50)
+        - column:
+            defaultValueBoolean: true
+            name: active
+            type: BIT(1)
+        tableName: department
+
