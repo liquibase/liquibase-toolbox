@@ -1,0 +1,6 @@
+CREATE OR REPLACE VIEW &SCHEMA_OWNER..V_TEST4 AS
+
+SELECT uwi, well_name
+
+  FROM &tbl;
+;

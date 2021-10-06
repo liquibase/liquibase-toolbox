@@ -1,0 +1,32 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet author="BenD" id="151" context="DEV" labels="jira-4041">
+        <createTable tableName="ACTUAL1">
+            <column name="id" type="VARCHAR(100)"/>
+            <column name="city" type="VARCHAR(100)"/>
+            <column name="state" type="VARCHAR(100)"/>
+            <column name="country_code" type="VARCHAR(100)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="SteveZ" id="152" context="DEV" labels="jira-4047">
+        <sql>
+            create or replace procedure sun_authorize_non_sa as
+                begin
+                    begin
+                        return 0
+                    end
+                    execute sp_role "grant","sa_role",probe
+                    return 0
+                end
+        </sql>
+        <rollback>
+            DROP PROCEDURE sun_authorize_non_sa;
+        </rollback>
+    </changeSet>
+    <changeSet id="Joe" author="Shmoe">
+        <sqlFile path="sqlscripts/dml_inserts_v3.sql" />
+        <rollback>
+            <sqlFile path="sqlscripts/dml_inserts_v2.sql" />
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

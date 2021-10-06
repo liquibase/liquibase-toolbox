@@ -1,0 +1,140 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="create_students2" author="SteveZ">
+      <ext:createCollection collectionName="students2">
+          <ext:options>
+            {
+            validator: {
+               $jsonSchema: {
+                  bsonType: "object",
+                  required: [ "name", "year", "major", "address" ],
+                  properties: {
+                     name: {
+                        bsonType: "string",
+                        description: "must be a string and is required"
+                     },
+                     year: {
+                        bsonType: "int",
+                        minimum: 2017,
+                        maximum: 3017,
+                        description: "must be an integer in [ 2017, 3017 ] and is required"
+                     },
+                     major: {
+                        enum: [ "Math", "English", "Computer Science", "History", null ],
+                        description: "can only be one of the enum values and is required"
+                     },
+                     gpa: {
+                        bsonType: [ "double" ],
+                        description: "must be a double if the field exists"
+                     },
+                     address: {
+                        bsonType: "object",
+                        required: [ "city" ],
+                        properties: {
+                           street: {
+                              bsonType: "string",
+                              description: "must be a string if the field exists"
+                           },
+                           city: {
+                              bsonType: "string",
+                              "description": "must be a string and is required"
+                           }
+                        }
+                     }
+                  }
+               }
+            },
+            validationAction: "warn",
+            validationLevel: "strict"
+            }
+          </ext:options>
+      </ext:createCollection>
+    </changeSet>
+    <changeSet id="insertOne_tudents2" author="AmyS">
+        <ext:insertOne collectionName="students2">
+            <ext:document>
+                {
+                   name: "Alice",
+                   year: NumberInt(2019),
+                   major: "History",
+                   gpa: 3.0,
+                   address: {
+                      city: "NYC",
+                      street: "33rd Street"
+                   }
+                }
+            </ext:document>
+        </ext:insertOne>
+    </changeSet>
+    <changeSet id="create_inventory" author="AdeelM">
+      <ext:insertMany collectionName="inventory">
+          <ext:documents>
+            [
+             { item: "journal", qty: NumberInt(25), size: { h: 14, w: 21, uom: "cm" }, instock: true },
+             { item: "notebook", qty: NumberInt(50), size: { h: 8.5, w: 11, uom: "in" }, instock: true },
+             { item: "paper", qty: NumberInt(100), size: { h: 8.5, w: 11, uom: "in" }, instock: 1 },
+             { item: "planner", qty: NumberInt(75), size: { h: 22.85, w: 30, uom: "cm" }, instock: 1 },
+             { item: "postcard", qty: NumberInt(45), size: { h: 10, w: 15.25, uom: "cm" }, instock: true },
+             { item: "apple", qty: NumberInt(45), status: "A", instock: true },
+             { item: "pears", qty: NumberInt(50), status: "A", instock: true }
+            ]
+          </ext:documents>
+      </ext:insertMany>
+    </changeSet>
+    <!-- https://docs.mongodb.com/manual/core/capped-collections/ -->
+    <changeSet id="capped_inventory" author="RobertR">
+      <ext:runCommand>
+          <ext:command>
+            { 
+               cloneCollectionAsCapped: "inventory",
+               toCollection: "capped_inventory",
+               size: 100000,
+               comment: "This is a capped collection"
+             }
+          </ext:command>
+      </ext:runCommand>
+  </changeSet>
+  <changeSet id="create_car" author="AdeelM">
+   <ext:insertMany collectionName="car">
+       <ext:documents>
+         [
+         { _id: 1, name: "Alto", color: "Red",cno: "H410",speed:40,mfdcountry: "India"},
+         { _id: 2, name: "Polo", color: "White",cno: "H411",speed:45,mfdcountry: "Japan" },
+         { _id: 3, name: "Audi", color: "Black",cno: "H412",speed:50,mfdcountry: "Germany" }
+         ]
+       </ext:documents>
+   </ext:insertMany>
+ </changeSet>
+  <changeSet id="findAndModify_car" author="ChristineM">
+   <ext:runCommand>
+       <ext:command>
+             {
+               findAndModify: "car",
+               query: { name: "Alto" },
+               sort: { cno: 1 },
+               update: { $inc: { speed: 10 } },
+               }
+         </ext:command>
+      </ext:runCommand>
+   </changeSet>
+   <changeSet id="findAndModify_car2" author="SteveZ">
+      <ext:runCommand>
+          <ext:command>
+                {
+                  findAndModify: "car",
+                  query: { name: "Honda", color: "Silver", cno:"H415" ,speed: 25 },
+                  sort: { cno: 1 },
+                  update: { $inc: { speed: 20 } },
+                  upsert: true,
+                  new: true
+                  }
+            </ext:command>
+         </ext:runCommand>
+      </changeSet>
+
+</databaseChangeLog>

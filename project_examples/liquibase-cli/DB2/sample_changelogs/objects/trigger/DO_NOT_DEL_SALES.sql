@@ -1,0 +1,1 @@
+CREATE TRIGGER do_not_del_sales NO CASCADE BEFORE DELETE ON staff REFERENCING OLD AS oldstaff FOR EACH ROW MODE DB2SQL WHEN(oldstaff.job = 'Sales') BEGIN ATOMIC SIGNAL SQLSTATE '75000' ('Sales staff cannot be deleted... see the DO_NOT_DEL_SALES trigger.'); END

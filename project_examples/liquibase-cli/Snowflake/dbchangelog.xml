@@ -1,0 +1,89 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet  author="SteveZ"  id="createTable-MYTABLE5">  
+        <createTable tableName="MYTABLE5">  
+            <column name="C1"  type="STRING"/> 
+            <column name="C2"  type="STRING"/> 
+        </createTable>  
+    </changeSet>
+    <changeSet  author="SteveZ"  id="createTable-MYTABLE6">  
+        <createTable tableName="MYTABLE6">  
+            <column name="C1"  type="STRING"/> 
+            <column name="C2"  type="STRING"/> 
+        </createTable>  
+    </changeSet>
+    <changeSet author="liquibase-docs" id="addColumn-example1"> 
+        <addColumn tableName="MYTABLE5" >
+            <column name="address" 
+                position="2"  
+                type="varchar(255)"/>  
+            <column afterColumn="id" 
+                name="name"  
+                type="varchar(50)" >  
+                <constraints nullable="true" />  
+            </column>  
+        </addColumn>  
+    </changeSet>
+    <changeSet author="liquibase-docs" id="addColumn-example2"> 
+        <addColumn tableName="MYTABLE5">
+            <column name="age" type="STRING">  
+                <constraints nullable="true" />  
+            </column> 
+        </addColumn>  
+    </changeSet>
+    <changeSet  author="liquibase-docs"  id="insert-example1">  
+        <insert tableName="MYTABLE5">  
+            <column name="address"  value="6080 Tower Bridge Cir."/>
+            <column name="C1"  value="A1"/>  
+            <column name="C2"  value="A2"/>
+            <column name="age"  value="old"/>
+            <column name="name"  value="Bill"/>
+        </insert> 
+        <rollback>
+            DELETE FROM "MYTABLE5" WHERE "C1"='6080 Tower Bridge Cir.';
+        </rollback>
+    </changeSet>
+    <changeSet  author="liquibase-docs"  id="createView-example1">  
+        <createView viewName="MYVIEW_MYTABLE5">
+            SELECT * FROM MYTABLE5;
+        </createView>  
+    </changeSet>
+    <changeSet  author="liquibase-docs"  id="Alter_view-example">  
+        <dropView viewName="MYVIEW_MYTABLE5"/> 
+        <rollback>
+            <createView viewName="MYVIEW_MYTABLE5">
+                SELECT * FROM MYTABLE5;
+            </createView>
+        </rollback>
+    </changeSet>
+    <changeSet  author="liquibase-docs"  id="renameTable-example">  
+        <sql>
+            ALTER TABLE IF EXISTS MYTABLE5 RENAME TO CUSTOMER;
+        </sql>
+        <rollback>
+            ALTER TABLE IF EXISTS CUSTOMER RENAME TO MYTABLE5;
+        </rollback>  
+    </changeSet>
+    <changeSet  author="SteveZ"  id="4432535-read_result_set" context="DEV" labels="Feature1">  
+        <sqlFile path="sql/read_result_set.sql"
+                relativeToChangelogFile="true"  
+                splitStatements="false"/>
+        <rollback> 
+            <sqlFile path="sql/read_result_set_rollback.sql"  
+            relativeToChangelogFile="true"  
+            splitStatements="false"/>
+        </rollback>
+    </changeSet>
+    <changeSet  author="liquibase-docs"  id="createView-example2">  
+        <createView viewName="MYVIEW_CUSTOMER">
+            SELECT * FROM CUSTOMER;
+        </createView>  
+    </changeSet>
+    <changeSet  author="liquibase-docs"  id="addPrimaryKey-example">  
+        <addPrimaryKey tableName="CUSTOMER" columnNames="C1,C2" constraintName="pk_person"/>  
+    </changeSet>
+
+
+    <includeAll path="sql" context="DEV"/>
+
+</databaseChangeLog>

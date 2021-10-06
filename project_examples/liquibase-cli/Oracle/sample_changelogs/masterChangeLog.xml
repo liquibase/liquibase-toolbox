@@ -1,0 +1,42 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.3.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+    <!-- <property  name="table.name"  value="TABLE200"/>  -->
+    <!-- <includeAll path="sql2" /> -->
+    <include file="" />
+    <changeSet  author="SteveZ"  id="4432555-inserts" runOnChange="true">  
+        <sqlFile dbms="oracle"
+                 encoding="UTF-8"
+                 path="sql/ddl_file.sql" 
+                 relativeToChangelogFile="true"  
+                 splitStatements="true"
+                 stripComments="false"/>
+        <rollback> 
+            UPDATE "${table.name}" SET MIN_SALARY = '2' WHERE JOB_ID = 7;
+        </rollback>
+    </changeSet>
+    <!-- <changeSet  author="SteveZ"  id="4432556-Test" runOnChange="true">
+        <preConditions onFail="CONTINUE" onError="CONTINUE">
+            <sqlCheck  expectedResult="1">select COUNT(*) C from dba_tables where UPPER(table_name) = 'TABLE222'</sqlCheck>
+      </preConditions>  
+        <sqlFile path="changeLog3.sql"  
+                relativeToChangelogFile="true"  
+                splitStatements="true"/>
+        <rollback> 
+            <sqlFile path="changeLog3_rollback.sql"  
+                relativeToChangelogFile="true"  
+                splitStatements="true"/>
+        </rollback>
+    </changeSet> -->
+    <!-- <changeSet  author="SteveZ"  id="4432557-inserts" runOnChange="true">  
+        <sqlFile path="sql/changeLog4.sql"  
+                relativeToChangelogFile="true"  
+                splitStatements="true"/>
+        <rollback> 
+            UPDATE "${table.name}" SET MIN_SALARY = '2' WHERE JOB_ID = 7;
+        </rollback>
+    </changeSet> -->
+    <!-- <changeSet id="11" author="Bill">
+        <tagDatabase tag="release1" />
+    </changeSet> -->
+    
+</databaseChangeLog>

@@ -1,0 +1,102 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.0.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <!-- https://docs.liquibase.com/change-types/home.html -->
+
+    <!-- https://docs.liquibase.com/change-types/community/home.html -->
+<!-- https://docs.liquibase.com/change-types/community/create-table.html -->
+    <changeSet  author="BobD"  id="createTable-example" context="DEV" labels="Jira1002">  
+        <createTable remarks="country table. Contains 25 rows. References with locations table." tableName="COUNTRIES2" tablespace="USERS">
+            <column name="COUNTRY_ID" remarks="Primary key of countries2 table." type="CHAR(2 BYTE)">
+                <constraints notNullConstraintName="COUNTRY_ID_NN2" nullable="false" primaryKey="true" primaryKeyName="COUNTRY_C_ID_PK2"/>
+            </column>
+            <column name="COUNTRY_NAME" remarks="Country name" type="VARCHAR2(40 BYTE)"/>
+            <column name="REGION_ID" remarks="Region ID for the country. Foreign key to region_id column in the departments table." type="NUMBER"/>
+        </createTable> 
+    </changeSet>
+<!-- https://docs.liquibase.com/change-types/community/insert.html -->
+    <changeSet author="SteveZ" id="CREATE_COUNTRIES_TABLE" context="DEV" labels="Jira1000,Jira1002">
+        <insert tableName="COUNTRIES2">
+            <column name="COUNTRY_ID" value="2"/>
+            <column name="COUNTRY_NAME" value="US"/>
+            <column name="REGION_ID" valueNumeric="5"/>
+        </insert>
+        <insert tableName="COUNTRIES2">
+            <column name="COUNTRY_ID" value="3"/>
+            <column name="COUNTRY_NAME" value="HN"/>
+            <column name="REGION_ID" valueNumeric="6"/>
+        </insert>
+        <rollback>
+            <sql>
+                DELETE 
+                FROM 
+                    COUNTRIES2
+                WHERE
+                COUNTRY_ID = 3;
+            </sql>
+        </rollback>
+    </changeSet>
+<!-- https://docs.liquibase.com/change-types/community/create-procedure.html -->
+<!-- https://docs.liquibase.com/workflows/liquibase-community/using-rollback.html -->
+<!-- https://docs.liquibase.com/change-types/community/drop-procedure.html -->
+    <changeSet author="KevinC" id="134042-11" context="TEST" labels="Jira1000">
+        <createProcedure path="objects/storedprocedure/HELLO.sql" procedureName="HELLO" relativeToChangelogFile="true"/>
+        <rollback>
+            <dropProcedure procedureName="HELLO"/>
+        </rollback>
+    </changeSet>
+
+    <!-- https://docs.liquibase.com/change-types/pro/home.html -->
+
+<!-- https://docs.liquibase.com/change-types/pro/create-package.html -->
+    <changeSet author="AdeelM" id="16016" context="PROD" labels="Jira1000">
+        <pro:createPackage packageName="TRIGGER_TEST_API" path="objects/databasepackage/TRIGGER_TEST_API.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+<!-- https://docs.liquibase.com/change-types/pro/create-trigger.html -->
+    <changeSet author="DavidK" id="12310">
+        <pro:createTrigger disabled="false" path="objects/trigger/TRIGGER_TEST_AS_TRG.sql" relativeToChangelogFile="true" tableName="TRIGGER_TEST" triggerName="TRIGGER_TEST_AS_TRG"/>
+    </changeSet>
+
+<!-- https://docs.liquibase.com/change-types/community/sql-file.html -->
+    <changeSet author="SteveZ" id="external-sqlFile+rollback-script-example" context="QA" labels="Jira1000">
+      <sqlFile dbms="oracle" splitStatements="true" endDelimiter="//" stripComments="true" path="objects/function/split_tokenV3.sql"/>
+        <rollback>
+            <sqlFile dbms="oracle" splitStatements="true" endDelimiter="//" stripComments="true" path="objects/function/split_tokenV2.sql"/>
+        </rollback>
+    </changeSet>
+    <changeSet  author="SteveZ"  id="4432555-inserts" runOnChange="true">  
+        <sqlFile dbms="oracle"
+                    encoding="UTF-8"
+                    path="DML/sales_V45.sql" 
+                    relativeToChangelogFile="true"  
+                    splitStatements="true"
+                    stripComments="false"/>
+        <rollback> 
+            DELETE 
+            FROM 
+                EMPLOYEES
+            WHERE
+                EMPLOYEE_ID = 1;
+        </rollback>
+    </changeSet>
+
+<!-- https://docs.liquibase.com/change-types/community/sql.html -->
+<changeSet  author="liquibase-docs"  id="sql-example" context="QA" labels="Jira1000">  
+    <sql  dbms="!h2, oracle, mysql" stripComments="true">
+        INSERT INTO EMPLOYEES 
+        (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID) 
+            VALUES
+        (1, 'John', 'Deer', 'j@gmail.com', '555-555-5555', '2020-05-05', 'Manager', 0, 0, 0, 0);
+        <comment>What about Bob?</comment>  
+    </sql>
+    <rollback>
+        <sql>
+            DELETE 
+            FROM 
+                EMPLOYEES
+            WHERE
+            EMPLOYEE_ID = 1;
+        </sql>
+    </rollback>
+</changeSet>
+    
+</databaseChangeLog>

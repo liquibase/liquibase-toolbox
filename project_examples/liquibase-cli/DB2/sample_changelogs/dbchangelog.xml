@@ -1,0 +1,382 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-1">
+        <createTable tableName="EMPLOYEE">
+            <column name="EMPNO" type="CHAR(6)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_EMPLOYEE"/>
+            </column>
+            <column name="FIRSTNME" type="VARCHAR(12)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MIDINIT" type="CHAR(1)"/>
+            <column name="LASTNAME" type="VARCHAR(15)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="WORKDEPT" type="CHAR(3)"/>
+            <column name="PHONENO" type="CHAR(4)"/>
+            <column name="HIREDATE" type="date"/>
+            <column name="JOB" type="CHAR(8)"/>
+            <column name="EDLEVEL" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SEX" type="CHAR(1)"/>
+            <column name="BIRTHDATE" type="date"/>
+            <column name="SALARY" type="DECIMAL(9, 2)"/>
+            <column name="BONUS" type="DECIMAL(9, 2)"/>
+            <column name="COMM" type="DECIMAL(9, 2)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-2">
+        <createTable tableName="PROJECT">
+            <column name="PROJNO" type="CHAR(6)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PROJECT"/>
+            </column>
+            <column defaultValue="" name="PROJNAME" type="VARCHAR(24)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DEPTNO" type="CHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="RESPEMP" type="CHAR(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PRSTAFF" type="DECIMAL(5, 2)"/>
+            <column name="PRSTDATE" type="date"/>
+            <column name="PRENDATE" type="date"/>
+            <column name="MAJPROJ" type="CHAR(6)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-3">
+        <pro:createSynonym objectName="EMPLOYEE" objectType="TABLE" private="true" synonymName="EMP"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-4">
+        <createTable tableName="ACT">
+            <column name="ACTNO" type="SMALLINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ACT"/>
+            </column>
+            <column name="ACTKWD" type="CHAR(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ACTDESC" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-5">
+        <createTable tableName="DEPARTMENT">
+            <column name="DEPTNO" type="CHAR(3)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_DEPARTMENT"/>
+            </column>
+            <column name="DEPTNAME" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MGRNO" type="CHAR(6)"/>
+            <column name="ADMRDEPT" type="CHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LOCATION" type="CHAR(16)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-6">
+        <pro:createSynonym objectName="PROJECT" objectType="TABLE" private="true" synonymName="PROJ"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-7">
+        <createTable tableName="PROJACT">
+            <column name="PROJNO" type="CHAR(6)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PROJACT"/>
+            </column>
+            <column name="ACTNO" type="SMALLINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PROJACT"/>
+            </column>
+            <column name="ACSTAFF" type="DECIMAL(5, 2)"/>
+            <column name="ACSTDATE" type="date">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PROJACT"/>
+            </column>
+            <column name="ACENDATE" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-8">
+        <createTable tableName="EMPPROJACT">
+            <column name="EMPNO" type="CHAR(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PROJNO" type="CHAR(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ACTNO" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EMPTIME" type="DECIMAL(5, 2)"/>
+            <column name="EMSTDATE" type="date"/>
+            <column name="EMENDATE" type="date"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-9">
+        <pro:createSynonym objectName="DEPARTMENT" objectType="TABLE" private="true" synonymName="DEPT"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-10">
+        <createView fullDefinition="true" viewName="VDEPMG1">CREATE VIEW VDEPMG1 (DEPTNO, DEPTNAME, MGRNO, FIRSTNME, MIDINIT,   LASTNAME, ADMRDEPT) AS SELECT ALL DEPTNO, DEPTNAME, EMPNO, FIRSTNME, MIDINIT,   LASTNAME, ADMRDEPT FROM DEPT LEFT OUTER  JOIN EMP ON MGRNO = EMPNO</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-11">
+        <createView fullDefinition="true" viewName="VEMP">CREATE VIEW VEMP    AS SELECT ALL EMPNO ,   FIRSTNME,   MIDINIT ,   LASTNAME,   WORKDEPT   FROM EMP</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-12">
+        <createView fullDefinition="true" viewName="VEMPDPT1">CREATE VIEW VEMPDPT1 (DEPTNO, DEPTNAME, EMPNO, FRSTINIT, MIDINIT,   LASTNAME, WORKDEPT) AS SELECT ALL DEPTNO, DEPTNAME, EMPNO, SUBSTR(FIRSTNME, 1, 1), MIDINIT,   LASTNAME, WORKDEPT FROM DEPT  RIGHT OUTER JOIN EMP ON WORKDEPT = DEPTNO</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-13">
+        <createView fullDefinition="true" viewName="VEMPLP">CREATE VIEW VEMPLP   (EMPLOYEENUMBER,   PHONENUMBER) AS SELECT ALL EMPNO ,   PHONENO FROM EMP</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-14">
+        <createView fullDefinition="true" viewName="VPHONE">CREATE VIEW VPHONE   (LASTNAME,   FIRSTNAME,   MIDDLEINITIAL,   PHONENUMBER,   EMPLOYEENUMBER,   DEPTNUMBER,   DEPTNAME) AS SELECT ALL LASTNAME,   FIRSTNME,   MIDINIT ,   VALUE(PHONENO,' '),   EMPNO,   DEPTNO,   DEPTNAME FROM EMP, DEPT WHERE WORKDEPT = DEPTNO</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-15">
+        <createView fullDefinition="true" viewName="VPROJRE1">CREATE VIEW VPROJRE1   (PROJNO,PROJNAME,PROJDEP,RESPEMP,FIRSTNME,MIDINIT,   LASTNAME,MAJPROJ) AS SELECT ALL   PROJNO,PROJNAME,DEPTNO,EMPNO,FIRSTNME,MIDINIT,   LASTNAME,MAJPROJ FROM PROJ, EMP WHERE RESPEMP = EMPNO</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-16">
+        <createView fullDefinition="true" viewName="VSTAFAC2">CREATE VIEW VSTAFAC2 (PROJNO, ACTNO, ACTDESC, EMPNO, FIRSTNME, MIDINIT, LASTNAME, EMPTIME,STDATE, ENDATE, TYPE) AS SELECT ALL EP.PROJNO, EP.ACTNO, AC.ACTDESC, EP.EMPNO,EM.FIRSTNME, EM.MIDINIT, EM.LASTNAME, EP.EMPTIME, EP.EMSTDATE,   EP.EMENDATE,'2' FROM EMPPROJACT EP, ACT AC, EMP EM WHERE EP.ACTNO = AC.ACTNO AND EP.EMPNO = EM.EMPNO</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-17">
+        <createView fullDefinition="true" viewName="VASTRDE2">CREATE VIEW VASTRDE2   (DEPT1NO,DEPT1NAM,EMP1NO,EMP1FN,EMP1MI,EMP1LN,TYPE2,   DEPT2NO,DEPT2NAM,EMP2NO,EMP2FN,EMP2MI,EMP2LN) AS SELECT ALL   D1.DEPTNO,D1.DEPTNAME,D1.MGRNO,D1.FIRSTNME,D1.MIDINIT,   D1.LASTNAME,'2',   D1.DEPTNO,D1.DEPTNAME,E2.EMPNO,E2.FIRSTNME,E2.MIDINIT,   E2.LASTNAME FROM VDEPMG1 D1, EMP E2 WHERE D1.DEPTNO = E2.WORKDEPT</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-18">
+        <createView fullDefinition="true" viewName="VPROJ">CREATE VIEW VPROJ    AS SELECT ALL PROJNO, PROJNAME, DEPTNO, RESPEMP, PRSTAFF, PRSTDATE, PRENDATE, MAJPROJ FROM PROJ</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-19">
+        <createView fullDefinition="true" viewName="VACT">CREATE VIEW VACT AS SELECT ALL ACTNO ,   ACTKWD ,   ACTDESC FROM ACT</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-20">
+        <createView fullDefinition="true" viewName="VSTAFAC1">CREATE VIEW VSTAFAC1(PROJNO, ACTNO, ACTDESC, EMPNO, FIRSTNME, MIDINIT,      LASTNAME, EMPTIME,STDATE,ENDATE, TYPE) AS SELECT ALL PA.PROJNO, PA.ACTNO, AC.ACTDESC,' ', ' ', ' ', ' ',   PA.ACSTAFF, PA.ACSTDATE,   PA.ACENDATE,'1' FROM PROJACT PA, ACT AC  WHERE PA.ACTNO = AC.ACTNO</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-21">
+        <createView fullDefinition="true" viewName="VDEPT">CREATE VIEW VDEPT      AS SELECT ALL DEPTNO,   DEPTNAME,   MGRNO,   ADMRDEPT   FROM DEPT</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-22">
+        <createView fullDefinition="true" viewName="VHDEPT">CREATE VIEW VHDEPT    AS SELECT ALL DEPTNO ,   DEPTNAME,   MGRNO ,   ADMRDEPT,   LOCATION   FROM DEPT</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-23">
+        <createView fullDefinition="true" viewName="VPROJACT">CREATE VIEW VPROJACT    AS SELECT ALL PROJNO,ACTNO, ACSTAFF, ACSTDATE, ACENDATE FROM PROJACT</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-24">
+        <createView fullDefinition="true" viewName="VEMPPROJACT">CREATE VIEW VEMPPROJACT AS SELECT ALL EMPNO, PROJNO, ACTNO, EMPTIME, EMSTDATE, EMENDATE FROM EMPPROJACT</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-25">
+        <createView fullDefinition="true" viewName="VFORPLA">CREATE VIEW VFORPLA   (PROJNO,PROJNAME,RESPEMP,PROJDEP,FRSTINIT,MIDINIT,LASTNAME) AS SELECT ALL F1.PROJNO,PROJNAME,RESPEMP,PROJDEP, SUBSTR(FIRSTNME, 1, 1),   MIDINIT, LASTNAME FROM VPROJRE1 F1 LEFT OUTER JOIN EMPPROJACT F2 ON F1.PROJNO = F2.PROJNO</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-26">
+        <createView fullDefinition="true" viewName="VASTRDE1">CREATE VIEW VASTRDE1   (DEPT1NO,DEPT1NAM,EMP1NO,EMP1FN,EMP1MI,EMP1LN,TYPE2,   DEPT2NO,DEPT2NAM,EMP2NO,EMP2FN,EMP2MI,EMP2LN) AS SELECT ALL   D1.DEPTNO,D1.DEPTNAME,D1.MGRNO,D1.FIRSTNME,D1.MIDINIT,   D1.LASTNAME, '1',   D2.DEPTNO,D2.DEPTNAME,D2.MGRNO,D2.FIRSTNME,D2.MIDINIT,   D2.LASTNAME FROM VDEPMG1 D1, VDEPMG1 D2 WHERE D1.DEPTNO = D2.ADMRDEPT</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-27">
+        <createView fullDefinition="true" viewName="VPSTRDE1">CREATE VIEW VPSTRDE1   (PROJ1NO,PROJ1NAME,RESP1NO,RESP1FN,RESP1MI,RESP1LN,   PROJ2NO,PROJ2NAME,RESP2NO,RESP2FN,RESP2MI,RESP2LN) AS SELECT ALL   P1.PROJNO,P1.PROJNAME,P1.RESPEMP,P1.FIRSTNME,P1.MIDINIT,   P1.LASTNAME,   P2.PROJNO,P2.PROJNAME,P2.RESPEMP,P2.FIRSTNME,P2.MIDINIT,   P2.LASTNAME FROM VPROJRE1 P1,   VPROJRE1 P2 WHERE P1.PROJNO = P2.MAJPROJ</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-28">
+        <createView fullDefinition="true" viewName="VPSTRDE2">CREATE VIEW VPSTRDE2   (PROJ1NO,PROJ1NAME,RESP1NO,RESP1FN,RESP1MI,RESP1LN,   PROJ2NO,PROJ2NAME,RESP2NO,RESP2FN,RESP2MI,RESP2LN) AS SELECT ALL   P1.PROJNO,P1.PROJNAME,P1.RESPEMP,P1.FIRSTNME,P1.MIDINIT,   P1.LASTNAME,   P1.PROJNO,P1.PROJNAME,P1.RESPEMP,P1.FIRSTNME,P1.MIDINIT,   P1.LASTNAME FROM VPROJRE1 P1 WHERE NOT EXISTS (SELECT * FROM VPROJRE1 P2 WHERE P1.PROJNO = P2.MAJPROJ)</createView>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-29">
+        <createSequence sequenceName="SAMPSEQUENCE"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-30">
+        <createTable tableName="CL_SCHED">
+            <column name="CLASS_CODE" type="CHAR(7)"/>
+            <column name="DAY" type="SMALLINT"/>
+            <column name="STARTING" type="time"/>
+            <column name="ENDING" type="time"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-31">
+        <createTable tableName="EMPLOYEE2">
+            <column name="EMPNO" type="CHAR(6)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_EMPLOYEE2"/>
+            </column>
+            <column name="FIRSTNME" type="VARCHAR(12)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="MIDINIT" type="CHAR(1)"/>
+            <column name="LASTNAME" type="VARCHAR(15)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="WORKDEPT" type="CHAR(3)"/>
+            <column name="PHONENO" type="CHAR(4)"/>
+            <column name="HIREDATE" type="date"/>
+            <column name="JOB" type="CHAR(8)"/>
+            <column name="EDLEVEL" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SEX" type="CHAR(1)"/>
+            <column name="BIRTHDATE" type="date"/>
+            <column name="SALARY" type="DECIMAL(9, 2)"/>
+            <column name="BONUS" type="DECIMAL(9, 2)"/>
+            <column name="COMM" type="DECIMAL(9, 2)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-32">
+        <createTable tableName="EMPMDC">
+            <column name="EMPNO" type="INTEGER"/>
+            <column name="DEPT" type="INTEGER"/>
+            <column name="DIV" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-33">
+        <createTable tableName="EMP_PHOTO">
+            <column name="EMPNO" type="CHAR(6)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_EMP_PHOTO"/>
+            </column>
+            <column name="PHOTO_FORMAT" type="VARCHAR(10)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_EMP_PHOTO"/>
+            </column>
+            <column name="PICTURE" type="BLOB(102400)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-34">
+        <createTable tableName="EMP_RESUME">
+            <column name="EMPNO" type="CHAR(6)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_EMP_RESUME"/>
+            </column>
+            <column name="RESUME_FORMAT" type="VARCHAR(10)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_EMP_RESUME"/>
+            </column>
+            <column name="RESUME" type="CLOB(5120)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-35">
+        <createTable tableName="IN_TRAY">
+            <column name="RECEIVED" type="timestamp"/>
+            <column name="SOURCE" type="CHAR(8)"/>
+            <column name="SUBJECT" type="CHAR(64)"/>
+            <column name="NOTE_TEXT" type="VARCHAR(3000)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-36">
+        <createTable tableName="ORG">
+            <column name="DEPTNUMB" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DEPTNAME" type="VARCHAR(14)"/>
+            <column name="MANAGER" type="SMALLINT"/>
+            <column name="DIVISION" type="VARCHAR(10)"/>
+            <column name="LOCATION" type="VARCHAR(13)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-37">
+        <createTable tableName="SALES">
+            <column name="SALES_DATE" type="date"/>
+            <column name="SALES_PERSON" type="VARCHAR(15)"/>
+            <column name="REGION" type="VARCHAR(15)"/>
+            <column name="SALES" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-38">
+        <createTable tableName="STAFF">
+            <column name="ID" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(9)"/>
+            <column name="DEPT" type="SMALLINT"/>
+            <column name="JOB" type="CHAR(5)"/>
+            <column name="YEARS" type="SMALLINT"/>
+            <column name="SALARY" type="DECIMAL(7, 2)"/>
+            <column name="COMM" type="DECIMAL(7, 2)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-39">
+        <createTable tableName="STAFFG">
+            <column name="ID" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARGRAPHIC(9)"/>
+            <column name="DEPT" type="SMALLINT"/>
+            <column name="JOB" type="GRAPHIC(5)"/>
+            <column name="YEARS" type="SMALLINT"/>
+            <column name="SALARY" type="DECIMAL(9)"/>
+            <column name="COMM" type="DECIMAL(9)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-40">
+        <createTable tableName="STORES">
+            <column autoIncrement="true" name="STORE_ID" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="SQL191222190828260"/>
+            </column>
+            <column name="STORE_NAME" type="VARCHAR(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ADDRESS_LINE_1" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ADDRESS_LINE_2" type="VARCHAR(100)"/>
+            <column name="CITY_ID" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATE_ID" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ZIP_CODE" type="VARCHAR(6)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-41">
+        <pro:addCheckConstraint constraintName="NUMBER" disabled="false" tableName="EMPLOYEE">PHONENO &gt;= '0000' AND PHONENO &lt;= '9999'</pro:addCheckConstraint>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-42">
+        <pro:createFunction functionName="RESIGN_EMPLOYEE" path="objects/function/RESIGN_EMPLOYEE.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-43">
+        <pro:createTrigger disabled="false" path="objects/trigger/DO_NOT_DEL_SALES.sql" relativeToChangelogFile="true" tableName="STAFF" triggerName="DO_NOT_DEL_SALES"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-44">
+        <pro:createTrigger disabled="false" path="objects/trigger/MIN_SALARY.sql" relativeToChangelogFile="true" tableName="STAFF" triggerName="MIN_SALARY"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-45">
+        <createProcedure path="objects/storedprocedure/BONUS_INCREASE.sql" procedureName="BONUS_INCREASE" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-46">
+        <pro:createSynonym objectName="EMPPROJACT" objectType="TABLE" private="true" synonymName="EMPACT"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-47">
+        <pro:createSynonym objectName="EMPPROJACT" objectType="TABLE" private="true" synonymName="EMP_ACT"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-48">
+        <createIndex indexName="XDEPT2" tableName="DEPARTMENT">
+            <column name="MGRNO"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-49">
+        <createIndex indexName="XDEPT3" tableName="DEPARTMENT">
+            <column name="ADMRDEPT"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-50">
+        <createIndex indexName="XEMP2" tableName="EMPLOYEE">
+            <column name="WORKDEPT"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-51">
+        <createIndex indexName="XPROJ2" tableName="PROJECT">
+            <column name="RESPEMP"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-52">
+        <addForeignKeyConstraint baseColumnNames="EMPNO" baseTableName="EMP_PHOTO" constraintName="FK_EMP_PHOTO" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="EMPNO" referencedTableName="EMPLOYEE" validate="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-53">
+        <addForeignKeyConstraint baseColumnNames="EMPNO" baseTableName="EMP_RESUME" constraintName="FK_EMP_RESUME" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="EMPNO" referencedTableName="EMPLOYEE" validate="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-54">
+        <addForeignKeyConstraint baseColumnNames="DEPTNO" baseTableName="PROJECT" constraintName="FK_PROJECT_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="DEPTNO" referencedTableName="DEPARTMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-55">
+        <addForeignKeyConstraint baseColumnNames="RESPEMP" baseTableName="PROJECT" constraintName="FK_PROJECT_2" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="EMPNO" referencedTableName="EMPLOYEE" validate="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-56">
+        <addForeignKeyConstraint baseColumnNames="MGRNO" baseTableName="DEPARTMENT" constraintName="RDE" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="NO ACTION" referencedColumnNames="EMPNO" referencedTableName="EMPLOYEE" validate="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-57">
+        <addForeignKeyConstraint baseColumnNames="WORKDEPT" baseTableName="EMPLOYEE" constraintName="RED" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="NO ACTION" referencedColumnNames="DEPTNO" referencedTableName="DEPARTMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-58">
+        <addForeignKeyConstraint baseColumnNames="PROJNO,ACTNO,EMSTDATE" baseTableName="EMPPROJACT" constraintName="REPAPA" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="PROJNO,ACTNO,ACSTDATE" referencedTableName="PROJACT" validate="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-59">
+        <addForeignKeyConstraint baseColumnNames="ADMRDEPT" baseTableName="DEPARTMENT" constraintName="ROD" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="DEPTNO" referencedTableName="DEPARTMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="support.liquibase.net (generated)" id="1590017552224-60">
+        <addForeignKeyConstraint baseColumnNames="PROJNO" baseTableName="PROJACT" constraintName="RPAP" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="PROJNO" referencedTableName="PROJECT" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
