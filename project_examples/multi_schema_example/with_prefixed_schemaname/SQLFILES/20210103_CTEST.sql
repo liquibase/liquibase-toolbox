@@ -1,0 +1,12 @@
+--liquibase formatted sql
+
+--changeset SteveZ:45555-createTable_TABLE200 context:CTEST labels:Jira-166,feature1
+CREATE TABLE CTEST.TABLE200
+ (
+   JOB_ID VARCHAR2(10 BYTE) NOT NULL,
+   MIN_SALARY NUMBER(6, 0),
+   MAX_SALARY NUMBER(6, 0),
+   CONSTRAINT JOB_ID_PK200 PRIMARY KEY (JOB_ID)
+ )
+;
+--rollback DROP TABLE CTEST.TABLE200
