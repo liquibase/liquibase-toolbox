@@ -1,0 +1,63 @@
+{
+    "databaseChangeLog": [
+      {
+        "changeSet": {
+          "id": "1",
+          "author": "Alex",
+          "comment": "Update old people address",
+          "changes": [
+            {
+              "runCommand": {
+                "command": {
+                  "$rawJson": {
+                    "update": "person",
+                    "updates": [
+                      {
+                        "q": {
+                          "age": 55
+                        },
+                        "u": {
+                          "$set": {
+                            "address": "Lapland"
+                          }
+                        },
+                        "upsert": false,
+                        "multi": false
+                      }
+                    ],
+                    "ordered": true
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "changeSet": {
+          "id": "2",
+          "author": "Nick",
+          "comment": "Delete Alex",
+          "changes": [
+            {
+              "runCommand": {
+                "command": {
+                  "$rawJson": {
+                    "delete": "person",
+                    "deletes": [
+                      {
+                        "q": {
+                          "name": "Alexandru Slobodcicov"
+                        },
+                        "limit" : 0
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
