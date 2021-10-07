@@ -1,0 +1,9 @@
+{
+    "databaseChangeLog": [
+      {
+        "include": {
+          "file": "generic-1-insert-people.json"
+        }
+      }
+    ]
+  }
