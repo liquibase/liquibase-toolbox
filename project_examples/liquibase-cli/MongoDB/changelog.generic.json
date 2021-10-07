@@ -1,0 +1,53 @@
+{
+    "databaseChangeLog": [
+      {
+        "property": {
+          "name": "collection.name",
+          "value": "person"
+        }
+      },
+      {
+        "changeSet": {
+          "id": "1",
+          "author": "alex",
+          "changes": [
+            {
+              "createCollection": {
+                "collectionName": "${collection.name}"
+              }
+            },
+            {
+              "createCollection": {
+                "collectionName": "person1",
+                "options": {
+                  "$rawJson": {
+                    "validator": {
+                      "$jsonSchema": {
+                        "bsonType": "object",
+                        "required": [
+                          "name",
+                          "address"
+                        ],
+                        "properties": {
+                          "name": {
+                            "bsonType": "string",
+                            "description": "The Name"
+                          },
+                          "address": {
+                            "bsonType": "string",
+                            "description": "The Address"
+                          }
+                        }
+                      }
+                    },
+                    "validationAction": "warn",
+                    "validationLevel": "strict"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
