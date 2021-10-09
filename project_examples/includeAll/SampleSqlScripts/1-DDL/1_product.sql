@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
---changeset SteveZ:createTable_product
+-- changeset SteveZ:createTable_product
 
 CREATE TABLE product (
     id IDENTITY PRIMARY KEY,
