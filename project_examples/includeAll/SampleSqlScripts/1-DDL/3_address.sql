@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 
---changeset SteveZ:createTable_address
+-- changeset RobertR:createTable_address
 
 CREATE TABLE address (
     id INT8 PRIMARY KEY,
