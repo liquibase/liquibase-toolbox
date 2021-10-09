@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+
+-- changeset MikeO:createTable_item
+
 CREATE TABLE item (
     id IDENTITY PRIMARY KEY,
     order_id INT8,
