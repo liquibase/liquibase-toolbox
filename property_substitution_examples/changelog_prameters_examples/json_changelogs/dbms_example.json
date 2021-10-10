@@ -1,0 +1,51 @@
+{ "databaseChangeLog": [
+    {
+        "property": {
+            "dbms": "oracle",
+            "name": "table.name",
+            "value": "oracle_table"
+        }
+    },
+    {
+        "property": {
+            "dbms": "postgresql",
+            "name": "table.name",
+            "value": "postgresql_table"
+        }
+    },
+    {
+        "property": {
+            "dbms": "oracle",
+            "name": "mySpecialValue",
+            "value": "(255)"
+        }
+    },
+    {
+        "property": {
+            "dbms": "postgresql",
+            "name": "mySpecialValue",
+            "value": ""
+        }
+    },
+    {
+        "changeSet": {
+        "id": "createTable-${table.name}-example",
+        "author": "liquibase-docs",
+        "changes": [
+        {
+            "createTable": {
+            "columns": [
+            {
+            "column": {
+            "name": "address",
+            "type": "varchar${mySpecialValue}"
+                }
+            }
+            ],
+            "tableName": "${table.name}_person"
+            }
+        }
+            ]
+            }
+        }
+]}

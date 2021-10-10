@@ -1,0 +1,23 @@
+{ "databaseChangeLog": [
+    {
+        "changeSet": {
+        "id": "createTable-${table.name}-example",
+        "author": "liquibase-docs",
+        "changes": [
+        {
+            "createTable": {
+            "columns": [
+            {
+            "column": {
+            "name": "address",
+            "type": "${mySpecialValue}"
+                }
+            }
+            ],
+            "tableName": "${table.name}_person"
+            }
+        }
+            ]
+            }
+        }
+]}

@@ -1,0 +1,74 @@
+{ "databaseChangeLog": [
+    {
+      "property": {
+          "dbms": "oracle",
+          "name": "table.name",
+          "value": "oracle_table"
+        }
+    },
+    {
+      "property": {
+          "dbms": "postgresql",
+          "name": "table.name",
+          "value": "postgresql_table"
+        }
+    },
+    {
+      "property": {
+          "dbms": "oracle",
+          "name": "mySpecialValue",
+          "value": "(255)"
+        }
+    },
+    {
+      "property": {
+          "dbms": "postgresql",
+          "name": "mySpecialValue",
+          "value": ""
+        }
+    },
+    {
+    "property": {
+        "context": "DEV",
+        "name": "mySpecialContextValue",
+        "value": "dev_table"
+        }
+    },
+    {
+    "property": {
+        "context": "TEST",
+        "name": "mySpecialContextValue",
+        "value": "test_table"
+        }
+    },
+    {
+    "property": {
+        "context": "PROD",
+        "name": "mySpecialContextValue",
+        "value": "prod_table"
+        }
+    },
+    {
+    "include": {
+      "file": "child_changelog.json",
+      "author": "support.liquibase.net",
+      "relativeToChangeLog": "true"
+        }
+    },
+    {
+        "changeSet": {
+        "id": "sqlFile-example",
+        "author": "liquibase-docs",
+        "changes": [
+        {
+            "sqlFile": {
+            "path": "sqlFile_changetype_example.sql",
+            "relativeToChangeLogFile": "true"
+            }
+        }
+            ]
+            }
+        }
+    ]
+}
+    

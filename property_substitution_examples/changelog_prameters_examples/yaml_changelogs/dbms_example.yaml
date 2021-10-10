@@ -1,0 +1,37 @@
+databaseChangeLog:
+    - property:
+        dbms:  oracle,postgresql
+        name:  data.type
+        value:  varchar
+    - property:
+        dbms:  mysql
+        name:  data.type
+        value:  longtext
+    - property:
+        name:  table.name
+        value:  tableA
+    - property:
+        dbms:  mysql,oracle,postgresql
+        name:  column1.name
+        value:  columnB
+    - property:
+        dbms:  mysql,oracle,postgresql
+        name:  column3.name
+        value:  columnC
+    - changeSet:
+        id:  1
+        author:  joe
+        changes:
+        - createTable:
+            tableName:  ${table.name}
+            columns:
+            - column:
+                name: id
+                type: int
+            - column:
+                name: ${column1.name}
+                type: ${data.type}
+                defaultValue:  a  string  with  an  ${undefined.param}  param  against  ${dbNote}
+            - column:
+                name: ${column3.name}
+                type: int

@@ -1,0 +1,22 @@
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro" 
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
+	http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd
+	http://www.liquibase.org/xml/ns/dbchangelog-ext 
+	http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+    http://www.liquibase.org/xml/ns/pro 
+	http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.5.xsd">
+				
+				
+	<changeSet  id="1"  author="joe">
+		<createTable  tableName="${table.name}">
+			<column  name="id"  type="int"/>
+			<column  name="${column1.name}"  type="${data.type}"/>
+			<column  name="${column2.name}"  type="int"/>
+		</createTable>
+	</changeSet>
+    
+</databaseChangeLog>

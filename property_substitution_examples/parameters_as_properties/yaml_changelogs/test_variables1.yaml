@@ -1,0 +1,14 @@
+databaseChangeLog:
+    - changeSet:
+        id: 1
+        author: TsviZ
+        changes:
+        - createTable:
+            tableName: ${table.name}
+            columns:
+            - column:
+                name: id
+                type: int
+            - column:
+                name: column1
+                type: ${mySpecialValue}

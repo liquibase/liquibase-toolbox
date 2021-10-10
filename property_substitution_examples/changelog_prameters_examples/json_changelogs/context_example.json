@@ -1,0 +1,51 @@
+{ "databaseChangeLog": [
+    {
+        "property": {
+            "context": "TEST",
+            "name": "table.name",
+            "value": "test_table"
+        }
+    },
+    {
+        "property": {
+            "context": "PROD",
+            "name": "table.name",
+            "value": "prod_table"
+        }
+    },
+    {
+        "property": {
+            "context": "TEST",
+            "name": "mySpecialValue",
+            "value": "(255)"
+        }
+    },
+    {
+        "property": {
+            "context": "PROD",
+            "name": "mySpecialValue",
+            "value": ""
+        }
+    },
+    {
+        "changeSet": {
+        "id": "createTable-example",
+        "author": "liquibase-docs",
+        "changes": [
+        {
+            "createTable": {
+            "columns": [
+            {
+            "column": {
+            "name": "address",
+            "type": "varchar${mySpecialValue}"
+                }
+            }
+            ],
+            "tableName": "${table.name}_person"
+            }
+        }
+            ]
+            }
+        }
+]}

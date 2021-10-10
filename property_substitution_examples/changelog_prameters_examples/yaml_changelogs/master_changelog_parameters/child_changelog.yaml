@@ -1,0 +1,17 @@
+databaseChangeLog:
+    - changeSet:
+        id:  1
+        author:  joe
+        changes:
+        - createTable:
+            tableName:  ${table.name}
+            columns:
+            - column:
+                name: id
+                type: int
+            - column:
+                name: ${column1.name}
+                type: ${data.type}
+            - column:
+                name: ${column3.name}
+                type: int

@@ -1,0 +1,23 @@
+databaseChangeLog:
+    - property:
+        dbms:  oracle,postgresql
+        name:  data.type
+        value:  varchar
+    - property:
+        dbms:  mysql
+        name:  data.type
+        value:  longtext
+    - property:
+        name:  table.name
+        value:  tableA
+    - property:
+        dbms:  mysql,oracle,postgresql
+        name:  column1.name
+        value:  columnB
+    - property:
+        dbms:  mysql,oracle,postgresql
+        name:  column3.name
+        value:  columnC
+    - include:
+        file: child_changelog.yaml
+        relativeToChangelogFile: true

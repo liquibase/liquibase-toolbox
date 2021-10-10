@@ -1,0 +1,26 @@
+databaseChangeLog:
+    - property:
+        context:  TEST
+        name: table.name
+        value:  myTestTable
+    - property:
+        context:  PROD
+        name:  table.name
+        value: myProdTable
+
+    - changeSet:
+        id:  1
+        author:  joe
+        changes:
+        - createTable:
+            tableName:  ${table.name}
+            columns:
+            - column:
+                name: id
+                type: int
+            - column:
+                name: column1
+                type: int
+            - column:
+                name: column3
+                type: int
