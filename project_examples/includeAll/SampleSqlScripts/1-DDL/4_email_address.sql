@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+
+-- changeset JohnD:createTable_email_address
+
 CREATE TABLE email_address (
     id IDENTITY PRIMARY KEY,
     customer_id INT8,

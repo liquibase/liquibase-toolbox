@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+
+-- changeset RobertR:createTable_address
+
 CREATE TABLE address (
     id INT8 PRIMARY KEY,
     street VARCHAR(128),

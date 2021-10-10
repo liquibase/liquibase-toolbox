@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+
+-- changeset KevinC:dml_v1
+
 INSERT INTO product (id, sku, name, price) VALUES (1, 'keyboard', 'Keyboard', 7.99);
 INSERT INTO product (id, sku, name, price) VALUES (2, 'tv', 'Television', 351.96);
 INSERT INTO product (id, sku, name, price) VALUES (3, 'shirt', 'Shirt', 3.57);
