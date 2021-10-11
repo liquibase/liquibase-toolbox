@@ -5,10 +5,8 @@
 pipeline {
 agent any
   environment {
-    PROJ="<project_name>"
-    GITURL="https://github.com/<username>"
+    TAG="${params.tag}"
     ENVIRONMENT_STEP="${params.step}"
-    BRANCH="${params.pipeline}"
     PATH="C:\\Program Files\\liquibase;${env.PATH}"
   }
   stages {
@@ -16,30 +14,18 @@ agent any
     stage ('Precheck') {
 		steps {
 			bat '''
-        echo "Current project: "%PROJ%
-        echo "Current scm branch: "%BRANCH%
         echo "Current environment: "%ENVIRONMENT_STEP%
 	echo "Current PATH: "%PATH%
+	java -version
+	git status
 			'''
 		} // steps
 	} // stage 'precheck'
 
-    stage ('Checkout') {
-      steps {
-        // checkout Liquibase project from CLO repo
-        bat '''
-          git clone %GITURL%/%PROJ%.git
-          cd %PROJ%
-          git checkout %BRANCH%
-          git status
-          '''
-      } // steps for checkout stages
-    } // stage 'checkout'
 
    stage ('liquibase commands'){
       steps {
         bat '''
-          cd %PROJ%
           call liquibase --version
           echo "------------------------------------"
           echo "----------liquibase status----------"
@@ -50,17 +36,17 @@ agent any
           echo "---------------------------------------"
           call liquibase --url=%URL% --username=%USERNAME% --password=%PASSWORD% --contexts=%ENVIRONMENT_STEP%  --changeLogFile=changelog.sql --classpath=<JDBC_DRIVER>.jar updateSQL
           echo "--------------------------------------------------------"
-          echo "----------liquibase tag database with version1----------"
+          echo "----------liquibase tag database ----------"
           echo "--------------------------------------------------------"
-          call liquibase --url=%URL% --username=%USERNAME% --password=%PASSWORD% --contexts=%ENVIRONMENT_STEP%  --changeLogFile=changelog.sql --classpath=<JDBC_DRIVER>.jar tag version1
+          call liquibase --url=%URL% --username=%USERNAME% --password=%PASSWORD% --contexts=%ENVIRONMENT_STEP%  --changeLogFile=changelog.sql --classpath=<JDBC_DRIVER>.jar tag %TAG%
           echo "------------------------------------"
           echo "----------liquibase update----------"
           echo "------------------------------------"
           call liquibase --url=%URL% --username=%USERNAME% --password=%PASSWORD% --contexts=%ENVIRONMENT_STEP%  --changeLogFile=changelog.sql --classpath=<JDBC_DRIVER>.jar update
           echo "------------------------------------------------------------"
-          echo "----------liquibase rollback to version1--------------------"
+          echo "----------liquibase rollback to tag--------------------"
           echo "------------------------------------------------------------"
-          call liquibase --url=%URL% --username=%USERNAME% --password=%PASSWORD% --contexts=%ENVIRONMENT_STEP%  --changeLogFile=changelog.sql --classpath=<JDBC_DRIVER>.jar rollback version1
+          call liquibase --url=%URL% --username=%USERNAME% --password=%PASSWORD% --contexts=%ENVIRONMENT_STEP%  --changeLogFile=changelog.sql --classpath=<JDBC_DRIVER>.jar rollback %TAG%
         '''
       } // steps
     }   // Environment stage
