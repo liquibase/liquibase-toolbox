@@ -18,6 +18,26 @@ databaseChangeLog:
         dbms:  mysql,oracle,postgresql
         name:  column3.name
         value:  columnC
+    - property:
+        context: DEV
+        name:  mySpecialContextValue
+        value: dev
+    - property:
+        context: TEST
+        name:  mySpecialContextValue
+        value: test
+    - property:
+        context: PROD
+        name:  mySpecialContextValue
+        value: prod
     - include:
         file: child_changelog.yaml
         relativeToChangelogFile: true
+    - changeSet:
+        id: 1
+        author: TsviZ
+        changes:
+        - sqlFile:
+            path: sqlFile_changetype_example.sql
+            relativeToChangelogFile: true
+            
