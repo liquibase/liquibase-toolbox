@@ -5,35 +5,18 @@
 pipeline {
 agent any
   environment {
-    PROJ="<project_name>"
-    GITURL="https://github.com/<username>"
     ENVIRONMENT_STEP="${params.step}"
-    BRANCH="${params.pipeline}"
+    TAG="${params.tag}"
     PATH="/path/to/liquibase:$PATH"
   }
   stages {
-
-    stage ('Precheck') {
-		steps {
-			sh '''
-        { set +x; } 2>/dev/null
-        echo "Current project: "$PROJ
-        echo "Current scm branch: "$BRANCH
-        echo "Current environment: "$ENVIRONMENT_STEP
-			'''
-		} // steps
-	} // stage 'precheck'
 
     stage ('Checkout') {
       steps {
         // checkout Liquibase project from repo
         sh '''
           { set +x; } 2>/dev/null
-          cd /path/to/workspace
-          if [ -d "$PROJ" ]; then rm -Rf $PROJ; fi
-          git clone ${GITURL}/${PROJ}.git
-          cd ${PROJ}
-          git checkout $BRANCH
+	  java -version
           git status
           '''
       } // steps for checkout stages
@@ -43,16 +26,11 @@ agent any
       steps {
         sh '''
           { set +x; } 2>/dev/null
-          cd /path/to/workspace/${PROJ}
           liquibase --version
           echo "------------------------------------"
           echo "----------liquibase status----------"
           echo "------------------------------------"
           liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP status --verbose
-          echo "---------------------------------------------"
-          echo "----------liquibase rollbackCount=5----------"
-          echo "---------------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP rollbackCount 5
           echo "---------------------------------------"
           echo "----------liquibase updateSQL----------"
           echo "---------------------------------------"
@@ -60,7 +38,7 @@ agent any
           echo "---------------------------------------------"
           echo "----------liquibase tag database with version1----------"
           echo "---------------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP tag version1
+          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP tag $TAG
           echo "------------------------------------"
           echo "----------liquibase update----------"
           echo "------------------------------------"
@@ -72,19 +50,14 @@ agent any
           echo "---------------------------------------------"
           echo "----------liquibase rollback to version1----------"
           echo "---------------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP rollback version1
+          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP rollback $TAG
+	  echo "------------------------------------"
+          echo "----------liquibase update----------"
+          echo "------------------------------------"
+          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP update
         '''
       } // steps
     }   // Environment stage
 
-        stage ('Deleting project workspace'){
-           steps {
-             sh '''
-               { set +x; } 2>/dev/null
-               echo "Deleting project workspace..."
-               cd /path/to/workspace && rm -r ${PROJ}
-             '''
-           } // steps
-         }   // Deleting project workspace
   } // stages
 }  // pipeline
