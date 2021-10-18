@@ -42,7 +42,8 @@ jobs:
           #git config --global user.email $user.email; git config --global user.name $user.name; git config pull.rebase false; git add .; git commit -m $"message"; git push -u origin $branch
           
           echo "packaging the sample Springboot app with Liquibase example in liquibase-toolbox/project_examples/liquibase-springboot"
-
+          cd ../liquibase-toolbox/project_examples/liquibase-springboot
+          mvn clean package
  
         env:
             user.email: "<email>"
