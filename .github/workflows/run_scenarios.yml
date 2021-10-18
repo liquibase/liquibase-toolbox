@@ -41,10 +41,6 @@ jobs:
           # Uncomment the line below to save changes.  Also, see environment variables under "env" and assign variables accordingly
           #git config --global user.email $user.email; git config --global user.name $user.name; git config pull.rebase false; git add .; git commit -m $"message"; git push -u origin $branch
       
-      - run: |
-          echo "packaging the sample Springboot app with Liquibase example in liquibase-toolbox/project_examples/liquibase-springboot"
-          cd liquibase-toolbox/project_examples/liquibase-springboot
-          mvn clean package
  
         env:
             user.email: "<email>"
