@@ -47,3 +47,14 @@ jobs:
             message: "<enter commit message>"
             branch: "<git branch name>"
             LB_VERSION: "4.5.0"
+  
+  LBJobMaven:
+    runs-on: ubuntu-latest
+    steps:
+    - name: RunLiquibaseWithSpringboot
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      uses: actions/checkout@v2
+    - run: |
+        cd project_examples/liquibase-springboot
+        mvn clean package
+  
