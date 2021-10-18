@@ -43,7 +43,7 @@ jobs:
           
           echo "packaging the sample Springboot app with Liquibase example in liquibase-toolbox/project_examples/liquibase-springboot"
           cd liquibase-toolbox/project_examples/liquibase-springboot
-          mvn clean package
+          # mvn clean package
  
         env:
             user.email: "<email>"
