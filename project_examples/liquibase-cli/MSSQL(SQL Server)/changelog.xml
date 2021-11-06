@@ -1,11 +1,68 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-    <changeSet author="SteveZ" id="15-Customer226">
-        <createTable tableName="Customer226">
-            <column name="CustomerTypeID" type="nchar(10)">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd" changeLogId="b61fdc25-0184-4f70-8222-b35dd53d7b1f">
+    
+    <property  name="PIPELINE_STEP" value="dev"  context="DEV"/>
+    <property  name="PIPELINE_STEP" value="test" context="TEST"/>
+    <property  name="PIPELINE_STEP" value="prod" context="PROD"/>
+
+    <changeSet author="Tsvi" id="createTable_salesTableZ" context="DEV,QA,UAT,PROD" labels="Jira1123">
+        <createTable tableName="salesTableZ">
+            <column computed="false" name="ID" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="CustomerDesc" type="nvarchar(MAX)"/>
+            <column computed="false" name="NAME" type="varchar(20)"/>
+            <column computed="false" name="REGION" type="varchar(20)"/>
+            <column computed="false" name="MARKET" type="varchar(20)"/>
         </createTable>
     </changeSet>
+    
+    <changeSet author="Martha" id="createTable_CustomerInfo" context="DEV,QA,UAT,PROD">
+        <createTable tableName="CustomerInfo">
+            <column computed="false" name="CustomerTypeID" type="nchar(10)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_CustomerTypeID"/>
+            </column>
+            <column computed="false" name="CustomerDesc" type="nvarchar(MAX)"/>
+            <column computed="false" name="address" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+    
+    <changeSet author="Kevin" id="CREATE_PROCEDURE_CustOrderHist1" context="DEV,QA,UAT,PROD" >
+        <createProcedure path="objects/storedprocedure/CustOrderHist1.sql" procedureName="CustOrderHist1" relativeToChangelogFile="true" replaceIfExists="true"/>
+        <rollback>
+            <sql>
+                drop procedure CustOrderHist1
+            </sql>
+        </rollback>
+    </changeSet>
+    
+    <changeSet author="Amy" id="CREATE_PROCEDURE_CustOrderHist2" context="DEV,QA,PROD,UAT">
+        <createProcedure path="objects/storedprocedure/CustOrderHist2.sql" procedureName="CustOrderHist2" relativeToChangelogFile="true" replaceIfExists="true"/>
+        <rollback>
+            <sql>
+                drop procedure CustOrderHist2
+            </sql>
+        </rollback>
+    </changeSet>
+
+<!--
+    <changeSet author="Tsvi" id="112" labels="IGNORE">
+            <sql>
+                INSERT INTO salesTableZ (ID, NAME, REGION, MARKET) VALUES (33, 'Ryan_${PIPELINE_STEP}', 'N. America', 'DevOps');
+            </sql>
+            <rollback>
+                <sql>
+                    DELETE FROM salesTableZ WHERE ID=33 AND NAME='Ryan_${PIPELINE_STEP}';
+                </sql>
+            </rollback>
+    </changeSet>
+
+    <changeSet author="Tsvi" id="dropTableWithPrecondition">
+        <preConditions onFail="HALT">
+            <tableIsEmpty tableName="salesTableZ"/>
+        </preConditions>
+        <dropTable tableName="salesTableZ"/>
+    </changeSet> 
+ -->
+    
 </databaseChangeLog>
+
