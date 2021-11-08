@@ -10,7 +10,7 @@ jobs:
     # Be sure to update the Docker image tag below to openjdk version of your application.
     # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/openjdk
     docker:
-      - image: liquibase/liquibase:4.4.0
+      - image: liquibase/liquibase:4.5.0
 # Service container image available at `host: localhost`
       - image: postgres:latest
         environment:
