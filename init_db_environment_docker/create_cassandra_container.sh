@@ -4,7 +4,7 @@ keySpaceName="${2:-"liquibase"}"
 docker run -p 9042:9042 --name $containerName -d cassandra
 
 # With credentials - username and password
-# docker run --name cassandra -e CASSANDRA_PASSWORD=Password1 -e CASSANDRA_PASSWORD_SEEDER=yes -p 9042:9042 -p 7000:7000 -p 7199:7199 -d bitnami/cassandra
+# docker run --name $containerName -e CASSANDRA_PASSWORD=Password1 -e CASSANDRA_PASSWORD_SEEDER=yes -p 9042:9042 -p 7000:7000 -p 7199:7199 -d bitnami/cassandra
 
 myIp=`docker inspect $containerName | grep -m 1 -w IPAddress | grep -o '[[:digit:].]' | tr -d '\n'`
 #docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerName
