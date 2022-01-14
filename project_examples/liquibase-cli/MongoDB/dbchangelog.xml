@@ -4,7 +4,6 @@
         xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
-
     <changeSet id="create_students2" author="SteveZ">
       <ext:createCollection collectionName="students2">
           <ext:options>
@@ -54,6 +53,9 @@
             }
           </ext:options>
       </ext:createCollection>
+	<rollback>	
+		<ext:dropCollection collectionName="students2" />
+	</rollback>	  	  
     </changeSet>
     <changeSet id="insertOne_tudents2" author="AmyS">
         <ext:insertOne collectionName="students2">
@@ -70,6 +72,21 @@
                 }
             </ext:document>
         </ext:insertOne>
+		<rollback>
+			<ext:runCommand>
+				<ext:command>
+                {
+                  delete: "students2",
+				  deletes: [
+					{
+					q: { name: "Alice" },
+					limit: 0
+					}
+				  ]
+                }
+				</ext:command>
+			</ext:runCommand>		
+		</rollback>		
     </changeSet>
     <changeSet id="create_inventory" author="AdeelM">
       <ext:insertMany collectionName="inventory">
@@ -85,6 +102,9 @@
             ]
           </ext:documents>
       </ext:insertMany>
+	<rollback>	
+		<ext:dropCollection collectionName="inventory" />
+	</rollback>	  	  
     </changeSet>
     <!-- https://docs.mongodb.com/manual/core/capped-collections/ -->
     <changeSet id="capped_inventory" author="RobertR">
@@ -98,6 +118,9 @@
              }
           </ext:command>
       </ext:runCommand>
+	<rollback>	
+		<ext:dropCollection collectionName="capped_inventory" />
+	</rollback>	  
   </changeSet>
   <changeSet id="create_car" author="AdeelM">
    <ext:insertMany collectionName="car">
@@ -109,6 +132,9 @@
          ]
        </ext:documents>
    </ext:insertMany>
+	<rollback>	
+		<ext:dropCollection collectionName="car" />
+	</rollback>
  </changeSet>
   <changeSet id="findAndModify_car" author="ChristineM">
    <ext:runCommand>
@@ -121,6 +147,18 @@
                }
          </ext:command>
       </ext:runCommand>
+		 <rollback>
+			<ext:runCommand>
+				<ext:command>
+              {
+               findAndModify: "car",
+               query: { name: "Alto" },
+               sort: { cno: 1 },
+               update: { $inc: { speed: -10 } },
+               }
+				</ext:command>
+			</ext:runCommand>
+		 </rollback>	  
    </changeSet>
    <changeSet id="findAndModify_car2" author="SteveZ">
       <ext:runCommand>
@@ -135,6 +173,20 @@
                   }
             </ext:command>
          </ext:runCommand>
+		 <rollback>
+			<ext:runCommand>
+				<ext:command>
+                {
+                  delete: "car",
+				  deletes: [
+					{
+					q: { name: "Honda" },
+					limit: 0
+					}
+				  ]
+                }
+				</ext:command>
+			</ext:runCommand>
+		 </rollback>
       </changeSet>
-
 </databaseChangeLog>
