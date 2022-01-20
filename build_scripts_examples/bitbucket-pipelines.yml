@@ -1,0 +1,43 @@
+image: liquibase/liquibase:4.7.0
+
+pipelines:
+  default:
+    - step:
+        name: 'Liquibase version and help utility'
+        script:
+          - liquibase --version
+          - liquibase --help
+    - step:
+        name: 'Deployment to Dev'
+        deployment: Dev
+        script:
+          - liquibase checks run
+          - liquibase validate
+          - liquibase status --verbose
+          - liquibase tag $BITBUCKET_BUILD_NUMBER
+          - liquibase --logLevel=info update
+          - liquibase rollback $BITBUCKET_BUILD_NUMBER
+          - liquibase --logLevel=info update
+          - liquibase history
+    - step:
+        name: 'Deployment to Test'
+        deployment: Test
+        script:
+          - liquibase status --verbose
+          - liquibase update
+          - liquibase history
+          - echo "Running diff between Dev and Test"
+          - liquibase diff
+    - step:
+        name: 'Deployment to Prod'
+        deployment: Prod
+        script:
+          - liquibase status --verbose
+          - liquibase update
+          - liquibase history
+          - echo "Running diff between Test and Prod"
+          - liquibase diff
+          - echo "Snapshotting database PROD"
+          - liquibase --outputFile=snapshot_PROD.json snapshot --snapshotFormat=json
+        artifacts:
+           - snapshot_PROD.json
