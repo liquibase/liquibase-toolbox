@@ -1,0 +1,1 @@
+This is a sample Pro custom checks repository to help Pro customers get started with [Quality Checks](https://www.liquibase.com/quality-checks)
