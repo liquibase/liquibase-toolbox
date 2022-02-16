@@ -1,5 +1,0 @@
-Custom check to ensure primary key is created on a create table statement.
-
-REGEXP:
-
-(?is)(?=.*create)(?=.*table)^(?!.*primary\s+key).*
