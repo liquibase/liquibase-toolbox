@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>New Sale</title>
+</head>
+<body>
+    <div align="center">
+        <h1>Enter New Sale</h1>
+        <br />
+        <form action="#" th:action="@{/save}" th:object="${sale}"
+            method="post">
+ 
+            <table border="0" cellpadding="10">
+                <tr>
+                    <td>Item Name:</td>
+                    <td><input type="text" th:field="*{item}" /></td>
+                </tr>
+                <tr>
+                    <td>Quantity:</td>
+                    <td><input type="text" th:field="*{quantity}" /></td>
+                </tr>
+                <tr>
+                    <td>Amount (USD):</td>
+                    <td><input type="text" th:field="*{amount}" /></td>
+                </tr>                            
+                <tr>
+                    <td colspan="2"><button type="submit">Save</button> </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
