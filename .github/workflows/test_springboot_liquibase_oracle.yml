@@ -1,7 +1,6 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+# This workflow will build a Java Springboot project with Maven, for the following project example: https://github.com/liquibase/liquibase-toolbox/tree/master/project_examples/liquibase-springboot/springboot_liquibase_oracle 
 
-name: Java CI with Maven
+name: Springboot CI with Maven and Spring Liquibase integration 
 
 on:
   workflow_dispatch:
@@ -31,7 +30,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn clean package -Duser.timezone=CST
+      run: cd project_examples/liquibase-springboot/springboot_liquibase_oracle && mvn clean package -Dspring.datasource.url=jdbc:oracle:thin:@127.0.0.1:49161/xe -Dspring.datasource.username=system -Dspring.datasource.password=oracle -Dspring.liquibase.change-log=classpath:db/changelog/changelog_version-3.2.oracle.sql -Dserver.port=8086 -Duser.timezone=CST
       
     - uses: actions/upload-artifact@master
       with:
