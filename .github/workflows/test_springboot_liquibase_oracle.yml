@@ -35,4 +35,4 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: my-artifact
-        path: target/SalesManager-0.0.1-SNAPSHOT.jar
+        path: project_examples/liquibase-springboot/springboot_liquibase_oracle/target/SalesManager-0.0.1-SNAPSHOT.jar
