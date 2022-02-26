@@ -1,0 +1,24 @@
+pipeline {
+    agent {
+        docker {
+            image 'liquibase/liquibase:4.8'
+            args '''
+               -e LIQUIBASE_COMMAND_URL
+               -e LIQUIBASE_COMMAND_USERNAME
+               -e LIQUIBASE_COMMAND_PASSWORD
+               -e LIQUIBASE_PRO_LICENSE_KEY
+            '''
+        }
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh '''
+                liquibase --version
+                liquibase --changeLogFile=./changelogs/changeLog.h2.sql status --verbose
+                liquibase --changeLogFile=./changelogs/changeLog.h2.sql update
+                '''
+            }
+        }
+    }
+}
