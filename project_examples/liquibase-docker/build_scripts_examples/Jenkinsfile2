@@ -15,8 +15,8 @@ pipeline {
             steps {
                 sh '''
                 liquibase --version
-                liquibase --changeLogFile=./changelogs/changeLog.h2.sql status --verbose
-                liquibase --changeLogFile=./changelogs/changeLog.h2.sql update
+                liquibase --changeLogFile=changelogs/changeLog.h2.sql status --verbose
+                liquibase --changeLogFile=changelogs/changeLog.h2.sql update
                 '''
             }
         }
