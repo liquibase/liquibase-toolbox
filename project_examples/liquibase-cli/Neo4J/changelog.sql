@@ -7,12 +7,12 @@ CREATE (TheMatrix:Movie {title:'The Matrix', released:1999, tagline:'Welcome to 
 
 -- changeset Tsvi:2
 CREATE (Keanu:Person {name:'Keanu Reeves', born:1964})
---rollback MATCH (n:Person {name: 'Carrie'})
+--rollback MATCH (n:Person {name: 'Keanu'})
 --rollback DELETE n
 
 -- changeset Tsvi:3
 CREATE (Carrie:Person {name:'Carrie-Anne Moss', born:1967})
---rollback MATCH (n:Person {name: 'Keanu'})
+--rollback MATCH (n:Person {name: 'Carrie'})
 --rollback DELETE n
 
 -- changeset Tsvi:4
