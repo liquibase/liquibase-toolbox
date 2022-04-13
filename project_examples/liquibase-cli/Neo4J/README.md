@@ -3,3 +3,4 @@ You can download the referenced jar files in the sample [liquibase.properties](h
 2. The Neo4J JDBC Driver from [here](https://repo1.maven.org/maven2/org/neo4j/neo4j-jdbc-driver/).
 
 <p>Check out <a href="https://docs.liquibase.com/concepts/connections/creating-config-properties.html" target="_blank">liquibase.properties</a>.</p>
+<a href="http://example.com/" target="_blank">Hello, world!</a>
