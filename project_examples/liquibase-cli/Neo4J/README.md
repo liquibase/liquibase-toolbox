@@ -4,3 +4,4 @@ You can download the referenced jar files in the sample [liquibase.properties](h
 
 <p>Check out <a href="https://docs.liquibase.com/concepts/connections/creating-config-properties.html" target="_blank">liquibase.properties</a>.</p>
 <a href="http://example.com/" target="_blank">Hello, world!</a>
+[text-to-highlight](actual-link){:target="\_blank"}
