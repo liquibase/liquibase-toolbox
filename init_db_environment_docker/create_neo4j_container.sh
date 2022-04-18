@@ -12,3 +12,5 @@ docker run \
 
 myIp=`docker inspect $containerName | grep -m 1 -w IPAddress | grep -o '[[:digit:].]' | tr -d '\n'`
 echo "New container '${containerName}' created with ip address: ${myIp}"
+docker update --restart unless-stopped $containerName
+
