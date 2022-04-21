@@ -1,0 +1,35 @@
+resources:
+  containers:
+  - container: LBPRO
+    image: liquibase/liquibase:latest
+    options: --user 0:0
+trigger:
+- master
+
+variables:
+- group: Liquibase DEV
+
+pool:
+  vmImage: ubuntu-latest
+container: LBPRO
+
+steps:
+- script: |
+    liquibase --version
+    liquibase checks run
+    liquibase tag $(Build.BuildId)
+    liquibase update
+    liquibase history
+
+  displayName: 'Running Liquibase commands'
+
+- script: |
+    mkdir $(System.DefaultWorkingDirectory)/artifacts
+    tar -czf $(System.DefaultWorkingDirectory)/artifacts/$(appname)-$(Build.BuildId).tar.gz .
+  displayName: 'Creating Artifact'
+
+
+- upload: $(System.DefaultWorkingDirectory)/artifacts/$(appname)-$(Build.BuildId).tar.gz
+  artifact: MyApp
+  
+  
