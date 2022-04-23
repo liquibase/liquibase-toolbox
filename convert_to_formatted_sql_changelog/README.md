@@ -10,5 +10,5 @@ Bash/Linux:
 
 Example:
 ```console
-/path/to/convertToFormattedSql.sh 'postgresql' myReferenceChangelog.xml myTargetChangelog.sql
+/path/to/convertToFormattedSql.sh postgresql myReferenceChangelog.xml myTargetChangelog.sql
 ```
