@@ -1,4 +1,5 @@
 This helper script converts any [changelog type](https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html) to formatted sql changelog.
+You can find your database type name [here](https://www.liquibase.org/get-started/databases) along with Liquibase supported databases.
 
 Usage:
 
