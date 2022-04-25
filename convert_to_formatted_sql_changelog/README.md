@@ -12,3 +12,7 @@ Example:
 ```console
 /path/to/convertToFormattedSql.sh postgresql myReferenceChangelog.xml myTargetChangelog.sql
 ```
+
+Common use-cases:
+* A user might need a way to generate the SQL from modeled changes (XML,YAML or JSON) for review purposes in an offline mode.
+* Running custom Quality Checks that only works for SQL (for example, [SqlUserDefinedPatternCheck](https://docs.liquibase.com/commands/quality-checks/getting-started-with-the-checks-command.html)) against modeled changes (XML,YAML or JSON).  
