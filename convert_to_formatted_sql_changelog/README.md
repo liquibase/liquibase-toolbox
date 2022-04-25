@@ -15,4 +15,4 @@ Example:
 
 Common use-cases:
 * A user might need a way to generate the SQL from modeled changes (XML,YAML or JSON) for review purposes in an offline mode.
-* As a result of generating/converting a new formatted SQL changelog from a modeled changelog, the user can now run custom Quality Checks that only works for SQL (for example, [SqlUserDefinedPatternCheck](https://docs.liquibase.com/commands/quality-checks/getting-started-with-the-checks-command.html)).
+* As a result of generating/converting a new formatted SQL changelog from a modeled changelog, the user can now run custom Quality Checks that only work for SQL (for example, [SqlUserDefinedPatternCheck](https://docs.liquibase.com/commands/quality-checks/getting-started-with-the-checks-command.html)).
