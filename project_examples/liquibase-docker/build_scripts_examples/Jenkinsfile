@@ -33,7 +33,7 @@ agent any
 	--env LIQUIBASE_PRO_LICENSE_KEY \
 	--env LIQUIBASE_COMMAND_CHANGELOG_FILE \
 	--rm \
-	-v "${cwd}"/changelogs:/liquibase/changelog:z \
+	-v "${cwd}"/changelogs:/liquibase/changelog \
 	liquibase/liquibase:latest --log-level=info update
           '''
       } // steps for checkout stages
