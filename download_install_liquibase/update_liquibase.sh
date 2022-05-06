@@ -1,6 +1,5 @@
 #!/bin/bash
-
-latest_version="$(curl -s https://github.com/liquibase/liquibase/releases/latest | grep -o "v.*" | sed s/'>.*'//g |  sed s/'v'//g | sed 's/"//g')"
+latest_version="$(curl  -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/liquibase/liquibase/releases/latest | grep -o "v.*" | grep -v "\"\," | grep "jar" | sed s/"v"//g | sed s/"\/.*"//g)"
 version="${1:-$latest_version}"
 if [ -z "$1" ]
   then
@@ -18,15 +17,21 @@ while true; do
 done
 fi
 
-cd
-
-if curl --fail -L https://github.com/liquibase/liquibase/releases/download/v${version}/liquibase-${version}.zip --output liquibase-${version}.zip ; 
+mkdir ~/liquibase_temp
+cd ~/liquibase_temp
+if wget https://github.com/liquibase/liquibase/releases/download/v${version}/liquibase-${version}.tar.gz ; 
 then
-    unzip -o -d liquibase liquibase-${version}.zip
+    tar xvfz liquibase-${version}.tar.gz
+    rm -rf liquibase-${version}.tar.gz
+    cd ..
+    rm -rf ~/liquibase
+    mv ~/liquibase_temp ~/liquibase
     tput setaf 2; echo "Liquibase is now updated to version $version"
     echo "Running liquibase --version";tput sgr0
-    ~/liquibase/liquibase --version
+    liquibase --version
 else
+    cd ..
+    rm -rf ~/liquibase_temp
     tput setaf 2; echo "ERROR: Please make sure to specify the correct version in the following format [x.x.x]. 
 For example(latest version): ~/update_liquibase" $latest_version
     echo "To see available versions visit https://github.com/liquibase/liquibase/releases";tput sgr0
