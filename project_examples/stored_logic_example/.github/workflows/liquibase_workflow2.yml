@@ -1,0 +1,46 @@
+# This is a basic workflow to help you get started with Actions
+
+name: run_changes_in_sandbox
+
+env:
+  LIQUIBASE_PRO_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+  JAVA_OPTS: "-Dserver.port=8086 -Duser.timezone=CST"
+  
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  workflow_dispatch:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
+#    inputs:
+#      tag:
+#        description: 'Enter tag to rollback'
+#        required: true
+    
+jobs:
+
+  Build_Job:
+    runs-on: ubuntu-latest
+    services:
+      oracle_dev:
+        # Docker Hub image
+        image: oracleinanutshell/oracle-xe-11g
+        ports:
+            - 49161:1521
+    environment: 
+      name: DEV
+
+    steps:
+    - name: Running Liquibase Commands
+      uses: actions/checkout@v2
+    - run: |
+          curl -L https://raw.githubusercontent.com/liquibase/liquibase-toolbox/master/download_install_liquibase/download_liquibase.sh --output download_liquibase.sh
+          chmod +x download_liquibase.sh
+          ./download_liquibase.sh
+          ./liquibase/liquibase --version
+          ./liquibase/liquibase --changeLogFile=main.xml checks run
+          sleep 30
+          ./liquibase/liquibase --changeLogFile=main.xml --labels=\!SQLPLUS --url=jdbc:oracle:thin:@127.0.0.1:49161/xe --username=system --password=oracle status --verbose 
+          ./liquibase/liquibase --changeLogFile=main.xml --labels=\!SQLPLUS --url=jdbc:oracle:thin:@127.0.0.1:49161/xe --username=system --password=oracle --log-level=info update

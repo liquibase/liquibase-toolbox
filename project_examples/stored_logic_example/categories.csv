@@ -1,0 +1,19 @@
+SQL> 
+SQL> SELECT category_id, category_name
+  2  FROM
+  3  categories;
+
+CATEGORY_ID CATEGORY_NAME
+----------- --------------------------------------------------
+        150 Miscellaneous
+         25 Delli
+         50 Produce
+         75 Bakery
+        100 General Merchandise
+        125 Technology
+        156 Dairy
+         72 Pultry
+
+8 rows selected.
+
+SQL> EXIT;

@@ -1,0 +1,56 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.9.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+    
+    <include file="sql_code/DDL/DDL_v1.sql"/>
+    <includeAll path="sql_code/DML"/>
+    
+    <!-- Handling Stored Logic Using a formatted SQL changelog example -->
+    <include file="sql_code/PROCEDURES/add_job_history.sql"/>
+    
+    <includeAll path="sql_code/SEQUENCES"/>
+    
+    <!-- Handling Stored Logic Using a sqlFile change type -->
+    <changeSet author="SteveZ" id="createTrigger_update_job_history" runOnChange="true">
+        <sqlFile path="sql_code/TRIGGERS/update_job_history_v2.sql" splitStatements="false"/>
+        <rollback>
+            <sqlFile path="sql_code/TRIGGERS/rollback_scripts/update_job_history_v1.sql" splitStatements="false"/>
+        </rollback>
+    </changeSet>
+    <!-- Using the Pro SQL Plus Integration to run plsql -->
+    <changeSet author="RobL" id="plsql_check_categories_data" labels="SPOOL_TEST,SQLPLUS" runWith="sqlplus" runOnChange="true" runAlways="true">
+        <preConditions onFail="HALT" onFailMessage="Error: Expected 8 rows">
+            <sqlCheck expectedResult="8">select count(*) from categories</sqlCheck>
+        </preConditions>
+        <sqlFile path="sql_code/PROCEDURES/spool_categories_data_sqlplus.sql"/>
+    </changeSet>
+    <changeSet author="LoraL" id="plsql_check_for_invalid_objects" labels="SPOOL_TEST,SQLPLUS" runOrder="last" runWith="sqlplus" runOnChange="true" runAlways="true">
+        <sqlFile path="sql_code/PROCEDURES/spool_invalid_objects_sqlplus.sql"/>
+    </changeSet>
+    <changeSet author="TsviZ" id="plsql_function_dept_salary" labels="SQLPLUS" runWith="sqlplus" runOnChange="true">
+        <sqlFile path="sql_code/FUNCTIONS/function_dept_salary.sql"/>
+    </changeSet>
+    
+    <!-- Using the Pro create trigger change type example -->
+    <changeSet author="IzzyZ" id="trigger_secure_employees">
+        <pro:createTrigger disabled="false"  
+            path="sql_code/TRIGGERS/secure_employees_v3.sql" 
+            scope="both"
+            tableName="employees"  
+            triggerName="secure_employees">
+        </pro:createTrigger> 
+        <rollback>
+            <pro:disableTrigger scope="both" tableName="employees" triggerName="secure_employees"/> 
+        </rollback>
+    </changeSet>
+    
+    <!-- For Database platforms that do not have the "create or replace function" option (ie, mysql), 
+        the "replaceIfExists="true" option can be used as the change type attribute -->
+    <!-- <changeSet  author="liquibase-docs"  id="createFunction-example" runAlways="true">
+        <pro:createFunction 
+            functionName="GetAllProducts"
+            path="my-logic.sql"
+            replaceIfExists="true">
+        </pro:createFunction>
+    </changeSet> -->
+    
+</databaseChangeLog>

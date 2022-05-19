@@ -1,0 +1,55 @@
+SQL> 
+SQL> set pages 999
+SQL> 
+SQL> col c1 heading 'owner' format a15
+SQL> col c2 heading 'name' format a40
+SQL> col c3 heading 'type' format a10
+SQL> 
+SQL> ttitle 'Invalid|Objects'
+SQL> 
+SQL> select
+  2  	owner	    c1,
+  3  	object_type c3,
+  4  	object_name c2
+  5  from
+  6  	dba_objects
+  7  where
+  8  	status != 'VALID'
+  9  and
+ 10  	 object_type in ('PACKAGE','FUNCTION','PROCEDURE','TRIGGER')
+ 11  order by
+ 12  	owner,
+ 13  	object_type;
+
+Sun May 15                                                             page    1
+                                    Invalid
+                                    Objects
+
+owner           type       name                                                 
+--------------- ---------- ----------------------------------------             
+CO_DEV          PROCEDURE  ADD_JOB_HISTORY113                                   
+                PROCEDURE  ADD_JOB_HISTORY112                                   
+                PROCEDURE  ADD_JOB_HISTORY115                                   
+                PROCEDURE  ADD_JOB_HISTORY114                                   
+                                                                                
+                                                                                
+JENKINSCI       PROCEDURE  ADD_JOB_HISTORY112                                   
+                PROCEDURE  ADD_JOB_HISTORY                                      
+                                                                                
+                                                                                
+JN_DEV          TRIGGER    SECURE_EMPLOYEES                                     
+                                                                                
+                                                                                
+JN_TEST         TRIGGER    SECURE_EMPLOYEES                                     
+                                                                                
+                                                                                
+MVN_UAT         TRIGGER    SALE_PRIMARY_KEY_TRG                                 
+                                                                                
+                                                                                
+TESTUSER        PROCEDURE  ADD_JOB_HISTORY112                                   
+                                                                                
+                                                                                
+
+10 rows selected.
+
+SQL> EXIT;

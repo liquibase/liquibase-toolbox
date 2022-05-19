@@ -1,0 +1,49 @@
+# This is a basic workflow to help you get started with Actions
+
+name: run_changes
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  workflow_dispatch:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
+#    inputs:
+#      tag:
+#        description: 'Enter tag to rollback'
+#        required: true
+       
+
+env:
+    LIQUIBASE_PRO_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+    LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_COMMAND_URL }}
+    LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_COMMAND_USERNAME }}
+    LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_COMMAND_PASSWORD }}
+    LIQUIBASE_COMMAND_CHANGELOG_FILE: ${{ secrets.LIQUIBASE_COMMAND_CHANGELOG_FILE }}
+#     LIQUIBASE_HUB_API_KEY: ${{ secrets.LIQUIBASE_HUB_API_KEY }}
+    
+jobs:
+
+  Build_Job:
+    runs-on: ubuntu-latest
+    environment: 
+      name: DEV
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Running Quality Checks
+      uses: docker://liquibase/liquibase:latest
+      with:
+        args: checks run
+        
+    - name: Reviewing pending SQL changes
+      uses: docker://liquibase/liquibase:latest
+      with:
+        args: status --verbose
+        
+    - name: Deploying Database Changes
+      uses: docker://liquibase/liquibase:latest
+      with:
+        args: update --log-level=info
