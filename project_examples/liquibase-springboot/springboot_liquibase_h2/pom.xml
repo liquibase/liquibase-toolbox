@@ -18,6 +18,29 @@
 		<java.version>1.8</java.version>
 		<liquibase.propertyFile>local.liquibase.properties</liquibase.propertyFile>
 	</properties>
+	
+	<profiles>
+        <profile>
+            <id>DB1</id>
+            <properties>
+                <liquibase.propertyFile>DB1.liquibase.properties</liquibase.propertyFile>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>DB2</id>
+            <properties>
+                <liquibase.propertyFile>DB2.liquibase.properties</liquibase.propertyFile>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>DB3</id>
+            <properties>
+                <liquibase.propertyFile>DB3.liquibase.properties</liquibase.propertyFile>
+            </properties>
+        </profile>
+    </profiles>
 
 	<dependencies>
 		<dependency>
