@@ -1,5 +1,5 @@
 #!/bin/bash
-latest_version="$(curl  -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/liquibase/liquibase/releases/latest | grep -o "v.*" | grep -v "\"\," | grep "jar" | sed s/"v"//g | sed s/"\/.*"//g)"
+latest_version="$(curl  -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/liquibase/liquibase/releases/latest | grep -o "v.*" | grep -v "\"\," | grep "core.*jar" | sed s/"v"//g | sed s/"\/.*"//g)"
 version="${1:-$latest_version}"
 if [ -z "$1" ]
   then
