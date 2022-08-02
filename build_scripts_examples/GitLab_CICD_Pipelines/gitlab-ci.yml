@@ -4,7 +4,7 @@ build-job:
   stage: build
   script:
     - echo "Liquibase latest version:" 
-    - curl -s https://github.com/liquibase/liquibase/releases/latest | grep -o "v.*" | sed s/'>.*'//g |  sed s/'v'//g | sed 's/"//g'
+    - curl  -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/liquibase/liquibase/releases/latest | grep -o "v.*" | grep -v "\"\," | grep "core.*jar" | sed s/"v"//g | sed s/"\/.*"//g
     - $DOWNLOAD_LB
     - $UNZIP_LB
     - echo "Hello, $GITLAB_USER_LOGIN!"
