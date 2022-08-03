@@ -22,6 +22,8 @@ steps:
     call liquibase --version
     call liquibase --changeLogFile=oracle_changelog.sql validate
     call liquibase --changeLogFile=oracle_changelog.sql updateSQL
+    call liquibase --changeLogFile=oracle_changelog.sql checks show
+    call liquibase --changeLogFile=oracle_changelog.sql checks run
   displayName: 'Run Prechecks'
 
 - script: |
