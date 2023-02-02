@@ -20,18 +20,12 @@ steps:
     call C:\agent\setupLBDEV.bat > NUL
     echo $(System.DefaultWorkingDirectory)
     call liquibase --version
-    call liquibase --changeLogFile=oracle_changelog.sql validate
-    call liquibase --changeLogFile=oracle_changelog.sql updateSQL
-    call liquibase --changeLogFile=oracle_changelog.sql checks show
-    call liquibase --changeLogFile=oracle_changelog.sql checks run
+    call liquibase flow --flow-file=liquibase-checks.flowfile.yaml
   displayName: 'Run Prechecks'
 
 - script: |
     call C:\agent\setupLBDEV.bat > NUL
-    call liquibase --changeLogFile=oracle_changelog.sql update
-    call liquibase --changeLogFile=oracle_changelog.sql rollbackOneUpdate --force
-    call liquibase --changeLogFile=oracle_changelog.sql update
-    call liquibase --changeLogFile=oracle_changelog.sql history
+    call liquibase flow --flow-file=liquibase.flowfile.yaml
   displayName: 'Running Liquibase in DEV environment'
 
 - script: |
