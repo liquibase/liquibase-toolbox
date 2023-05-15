@@ -1,35 +1,103 @@
-resources:
-  containers:
-  - container: LBPRO
-    image: liquibase/liquibase:latest
-    options: --user 0:0
-trigger:
-- master
+###
+### This sample pipeline is intended as a starting point for integration between Liquibase Pro and Azure DevOps pipelines
+### Review and update prior to use
+###
+### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase support: https://support.liquibase.com/knowledge
+### 
 
+###
+### Prior to running the following files must exist in repository:
+###
+### 1. liquibase.flowfile.yaml
+###    Liquibase flow file
+###    https://docs.liquibase.com/commands/flow/flow.html
+###
+### 2. liquibase.checks-settings.conf
+###    Liquibase quality checks configuration file
+###    https://docs.liquibase.com/commands/quality-checks/home.html
+###
+### 3. Snapshot_DEV.json
+###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
+###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
+###    https://docs.liquibase.com/commands/inspection/snapshot.html
+###
+### 4. changelog.main.xml
+###    Liquibase changelog file
+###    https://docs.liquibase.com/concepts/changelogs/home.html
+###
+
+###
+### Azure pipelines documentation: https://aka.ms/yaml
+###
+
+###
+### Pipelines can be triggered manually or via events
+###
+trigger: none
+
+###
+### Set Liquibase environment variables
+###
 variables:
-- group: Liquibase DEV
+  LB_ENVIRONMENT: DEV
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.main.xml
+  LIQUIBASE_COMMAND_TAG: $(Build.BuildNumber)
 
-pool:
-  vmImage: ubuntu-latest
-container: LBPRO
+###
+### Utilizes a local Linux agent with git and docker available
+### https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=browser
+###
+stages:
+- stage: Liquibase
+  pool:
+    name: Default
+    demands:
+    - agent.name -equals Liquibase
+  jobs:
+  - job: Liquibase
+    workspace:
+      clean: all
+    steps:
+###
+### Checkout repository
+###
+    - checkout: self
 
-steps:
-- script: |
-    liquibase --version
-    liquibase checks run
-    liquibase tag $(Build.BuildId)
-    liquibase update
-    liquibase history
-
-  displayName: 'Running Liquibase commands'
-
-- script: |
-    mkdir $(System.DefaultWorkingDirectory)/artifacts
-    tar -czf $(System.DefaultWorkingDirectory)/artifacts/$(appname)-$(Build.BuildId).tar.gz .
-  displayName: 'Creating Artifact'
-
-
-- upload: $(System.DefaultWorkingDirectory)/artifacts/$(appname)-$(Build.BuildId).tar.gz
-  artifact: MyApp
-  
-  
+###
+### Ensure liquibase user can update files
+###
+    - script: |
+        chmod 666 $(pwd)/*_$(LB_ENVIRONMENT).json
+      displayName: 'Updating permissions'
+###
+### Run the Liquibase flowfile
+### Liquibase should be installed where your agents run or invoked via Docker
+###
+    - script: |
+        docker run --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_PRO_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v $(pwd):/liquibase/changelog liquibase/liquibase:latest flow --flow-file=liquibase.flowfile.yaml
+###
+### These values should be pulled from pipeline variables or vault
+### https://learn.microsoft.com/en-us/azure/devops/pipelines/process/set-secret-variables?view=azure-devops&tabs=yaml%2Cbash
+### Secrets should include LIQUIBASE_COMMAND_URL, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_PRO_LICENSE_KEY
+###
+      env: 
+        LIQUIBASE_COMMAND_URL: $(LIQUIBASE_DEV_URL)
+        LIQUIBASE_COMMAND_USERNAME: $(LIQUIBASE_DEV_USER)
+        LIQUIBASE_COMMAND_PASSWORD: $(LIQUIBASE_DEV_PASSWORD)
+        LIQUIBASE_PRO_LICENSE_KEY: $(LIQUIBASE_PROKEY)
+      displayName: 'Running Liquibase'
+###
+### Update to your project repository
+###
+    - script: |
+        git switch -c main
+        git remote set-url origin https://$LIQUIBASE_GITHUB_TOKEN@github.com/jbennett-liquibase/Toolbox.git
+        git config --global user.name ado-pipelines
+        git config --global user.email ado-pipelines@microsoft.com
+        git add .
+        git commit -am "Update snapshots."
+        git push -u origin main --force
+      env: 
+        LIQUIBASE_GITHUB_TOKEN: $(LIQUIBASE_REPO_TOKEN)
+      displayName: 'Updating repository'

@@ -1,41 +1,154 @@
-##########           LIQUIBASE FLOWFILE                ##########
-##########  learn more http://docs.liquibase.com/flow  ##########
+###
+### This flowfile is intended to highlight best practices utilizing Liquibase Pro
+### Review and update prior to use
+###
+### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase support: https://support.liquibase.com/knowledge
+###
 
+### 
+### Prior to running the following files must exist in repository:
+###
+### 1. liquibase.flowfile.yaml
+###    This flow file
+###    https://docs.liquibase.com/commands/flow/flow.html
+###
+### 2. liquibase.checks-settings.conf
+###    Liquibase quality checks configuration file
+###    https://docs.liquibase.com/commands/quality-checks/home.html
+###
+### 3. Snapshot_DEV.json
+###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
+###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
+###    https://docs.liquibase.com/commands/inspection/snapshot.html
+###
+### 4. changelog.main.xml
+###    Liquibase changelog file
+###    https://docs.liquibase.com/concepts/changelogs/home.html
+###
 
+###
+### Global variables used in the flowfile
+###
+globalVariables:
+  ###
+  ### These variables are typically set via automation tools (see pipeline examples)
+  ###
+  ### Environment setup
+  ### LIQUIBASE_COMMAND_TAG should be a unique identifier e.g. job/build number
+  ###
+  ### LB_ENVIRONMENT
+  ### LIQUIBASE_COMMAND_TAG
+  ###
+  ### Secrets
+  ### These values should be pulled from a secure vault
+  ###
+  ### LIQUIBASE_COMMAND_URL
+  ### LIQUIBASE_COMMAND_USERNAME
+  ### LIQUIBASE_COMMAND_PASSWORD
+  ### LIQUIBASE_PRO_LICENSE_KEY
+  ###
+  ### Files
+  ### Use absolute paths when using Liquibase's Docker container
+  ###
+  BASE_DIR: "/liquibase/changelog"
+  DIFF_FILE: "${BASE_DIR}/Diff_${LB_ENVIRONMENT}.json"
+  SNAPSHOT_FILE: "Snapshot_${LB_ENVIRONMENT}.json"
+
+###
+### Stages to execute
+###
 stages:
-
-  ## The first stage of actions
   Default:
     actions:
       #
-      # Show the Quality Checks
+      # Validate changelog
+      #
+      - type: liquibase
+        command: validate
+      #
+      # View pending changes
+      #
+      - type: liquibase
+        command: status
+        cmdArgs: { verbose: "true" }
+      #
+      # Show quality checks
+      #
+      - type: liquibase
+        command: checks show
+      #
+      #
+      # Run quality checks
       #
       - type: liquibase
         command: checks run
+        cmdArgs: { checks-scope: "changelog, database" }
       #
-      # Quality Checks for changelog
+      # Run diff
+      # Update database type in cmdArgs (e.g., oracle, mssql, etc.)
       #
       - type: liquibase
-        command: checks run
-        cmdArgs: {checks-scope: changelog}
+        command: diff
+        globalArgs: { outputfile: "${DIFF_FILE}" }
+        cmdArgs: { referenceURL: "offline:snowflake?snapshot=${SNAPSHOT_FILE}", format: json }
       #
-      # Show the update
+      # Check for drift
+      # findstr for Windows agents, grep for Linux (and Liquibase's Docker container)
+      #
+      - type: shell
+        #command: findstr /i /r "unexpected missing changed" ${DIFF_FILE} 1>nul 2>&1 & if ERRORLEVEL 1 (exit 0) else (exit 1)
+        command: grep -E "unexpected|missing|changed" ${DIFF_FILE} >> /dev/null 2>&1 ; if [ $? -eq 0 ]; then exit 1; else exit 0; fi
+      #
+      # Tag the database
+      #
+      - type: liquibase
+        command: tag
+        cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
+      #
+      # Review pending changes
       #
       - type: liquibase
         command: updateSQL
       #
-      # Run the update
+      # Update the database
       #
       - type: liquibase
         command: update
       #
-      # Quality Checks for database
+      # Test rollbacks
+      # Non-production only
       #
       - type: liquibase
-        command: checks run
-        cmdArgs: {checks-scope: database}
+        if: "${LB_ENVIRONMENT} != PROD"
+        command: rollbackSQL
+        cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
+      #
+      # Test rollbacks
+      # Non-production only
+      #
+      - type: liquibase
+        if: "${LB_ENVIRONMENT} != PROD"
+        command: rollback
+        cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
+      #
+      # Test rollbacks
+      # Non-production only
+      #
+      - type: liquibase
+        if: "${LB_ENVIRONMENT} != PROD"
+        command: update
+      #
+      # Create updated snapshot
+      #
+      - type: liquibase
+        command: snapshot
+        globalArgs: { outputfile: "${BASE_DIR}/${SNAPSHOT_FILE}" }
+        cmdArgs: { snapshotFormat: "json" }
 
-## do these actions after all flow commands, regardless of whether the above commands were successful
+###
+### Always execute
+###
 endStage:
   actions:
     - type: liquibase

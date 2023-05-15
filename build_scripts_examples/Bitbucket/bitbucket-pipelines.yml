@@ -1,43 +1,78 @@
-image: liquibase/liquibase:4.7.0
+###
+### This sample pipeline is intended as a starting point for integration between Liquibase Pro and Bitbucket pipelines
+### Review and update prior to use
+###
+### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase support: https://support.liquibase.com/knowledge
+### 
+
+###
+### Prior to running the following files must exist in repository:
+###
+### 1. liquibase.flowfile.yaml
+###    Liquibase flow file
+###    https://docs.liquibase.com/commands/flow/flow.html
+###
+### 2. liquibase.checks-settings.conf
+###    Liquibase quality checks configuration file
+###    https://docs.liquibase.com/commands/quality-checks/home.html
+###
+### 3. Snapshot_DEV.json
+###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
+###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
+###    https://docs.liquibase.com/commands/inspection/snapshot.html
+###
+### 4. changelog.main.xml
+###    Liquibase changelog file
+###    https://docs.liquibase.com/concepts/changelogs/home.html
+###
+
+###
+### Bitbucket documentation: https://support.atlassian.com/bitbucket-cloud/docs/bitbucket-pipelines-configuration-reference/
+### Bitbucket pipeline validator: https://bitbucket-pipelines.prod.public.atl-paas.net/validator
+### Troubleshooting Docker on Linux: https://confluence.atlassian.com/bbkb/cannot-connect-to-the-docker-daemon-error-while-running-docker-commands-using-bitbucket-cloud-pipelines-linux-shell-runners-1189796514.html
+###
 
 pipelines:
-  default:
-    - step:
-        name: 'Liquibase version and help utility'
-        script:
-          - liquibase --version
-          - liquibase --help
-    - step:
-        name: 'Deployment to Dev'
-        deployment: Dev
-        script:
-          - liquibase checks run
-          - liquibase validate
-          - liquibase status --verbose
-          - liquibase tag $BITBUCKET_BUILD_NUMBER
-          - liquibase --logLevel=info update
-          - liquibase rollback $BITBUCKET_BUILD_NUMBER
-          - liquibase --logLevel=info update
-          - liquibase history
-    - step:
-        name: 'Deployment to Test'
-        deployment: Test
-        script:
-          - liquibase status --verbose
-          - liquibase update
-          - liquibase history
-          - echo "Running diff between Dev and Test"
-          - liquibase diff
-    - step:
-        name: 'Deployment to Prod'
-        deployment: Prod
-        script:
-          - liquibase status --verbose
-          - liquibase update
-          - liquibase history
-          - echo "Running diff between Test and Prod"
-          - liquibase diff
-          - echo "Snapshotting database PROD"
-          - liquibase --outputFile=snapshot_PROD.json snapshot --snapshotFormat=json
-        artifacts:
-           - snapshot_PROD.json
+###
+### Pipelines can be triggered manually or via events
+###
+  custom:
+    liquibase:
+      - step:
+###
+### Utilizes a local Linux runner with git and docker available
+### https://support.atlassian.com/bitbucket-cloud/docs/runners/
+###
+          runs-on:
+            - 'self.hosted'
+            - 'linux.shell'
+            - 'liquibase'
+          name: 'Running Liquibase'
+          script:
+            - export LB_ENVIRONMENT=DEV
+            - export LIQUIBASE_COMMAND_CHANGELOG_FILE=changelog.main.xml
+            - export LIQUIBASE_COMMAND_TAG=$BITBUCKET_BUILD_NUMBER
+###
+### Secrets should include LIQUIBASE_COMMAND_URL, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_PRO_LICENSE_KEY
+### https://support.atlassian.com/bitbucket-cloud/docs/variables-and-secrets/
+###
+            - export LIQUIBASE_COMMAND_URL=$LIQUIBASE_DEV_URL
+            - export LIQUIBASE_COMMAND_USERNAME=$LIQUIBASE_DEV_USER
+            - export LIQUIBASE_COMMAND_PASSWORD=$LIQUIBASE_DEV_PASSWORD
+            - export LIQUIBASE_PRO_LICENSE_KEY=$LIQUIBASE_PROKEY
+###
+### Run the Liquibase flowfile
+### Liquibase should be installed where your agents run or invoked via Docker
+###
+            - docker run --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_PRO_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v $(pwd):/liquibase/changelog liquibase/liquibase:latest flow --flow-file=liquibase.flowfile.yaml
+###
+### Update to your project repository
+###
+            - git remote set-url origin https://x-token-auth:$LIQUIBASE_BITBUCKET_TOKEN@bitbucket.org/toolbox-jb/toolbox.git
+###
+### Update respository
+###
+            - git add .
+            - git commit -m "Update snapshots."
+            - git push --force

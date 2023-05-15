@@ -1,34 +1,96 @@
+###
+### This sample pipeline is intended as a starting point for integration between Liquibase Pro and AWS CodeBuild pipelines
+### Review and update prior to use
+###
+### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase support: https://support.liquibase.com/knowledge
+### 
+
+###
+### Prior to running the following files must exist in repository:
+###
+### 1. liquibase.flowfile.yaml
+###    Liquibase flow file
+###    https://docs.liquibase.com/commands/flow/flow.html
+###
+### 2. liquibase.checks-settings.conf
+###    Liquibase quality checks configuration file
+###    https://docs.liquibase.com/commands/quality-checks/home.html
+###
+### 3. Snapshot_DEV.json
+###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
+###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
+###    https://docs.liquibase.com/commands/inspection/snapshot.html
+###
+### 4. changelog.main.xml
+###    Liquibase changelog file
+###    https://docs.liquibase.com/concepts/changelogs/home.html
+###
+
+###
+### AWS CodeBuild documentation: https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
+###
+
 version: 0.2
-    
+
 env:
+###
+### Set Liquibase environment variables
+###
   variables:
-    LIQUIBASE_COMMAND_URL: ""
+    LB_ENVIRONMENT: "DEV"
+    LIQUIBASE_COMMAND_CHANGELOG_FILE: "changelog.main.xml"
+    LIQUIBASE_COMMAND_TAG: $CODEBUILD_BUILD_NUMBER
   secrets-manager:
-    LIQUIBASE_COMMAND_USERNAME: 
-    LIQUIBASE_COMMAND_PASSWORD: 
-    LIQUIBASE_PRO_LICENSE_KEY: codebuild/cs/liquibase/demo:LIQUIBASE_PRO_KEY
+###
+### Use DockerHub credentials to bypass anonymous pull limits
+### https://docs.docker.com/docker-hub/download-rate-limit
+###
+    DOCKERHUB_USERNAME: "DOCKERHUB_USERNAME:DOCKERHUB_USERNAME"
+    DOCKERHUB_PASSWORD: "DOCKERHUB_PASSWORD:DOCKERHUB_PASSWORD"
+###
+### These values should be pulled from AWS Secrets Manager
+### Secrets should include LIQUIBASE_COMMAND_URL, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_PRO_LICENSE_KEY
+### Ensure user can access secrets from IAM Management Console
+###
+    LIQUIBASE_COMMAND_URL: "LIQUIBASE_DEV_URL:LIQUIBASE_DEV_URL"
+    LIQUIBASE_COMMAND_USERNAME: "LIQUIBASE_DEV_USER:LIQUIBASE_DEV_USER"
+    LIQUIBASE_COMMAND_PASSWORD: "LIQUIBASE_DEV_PASSWORD:LIQUIBASE_DEV_PASSWORD"
+    LIQUIBASE_PRO_LICENSE_KEY: "LIQUIBASE_PROKEY:LIQUIBASE_PROKEY"
+###
+### This pipeline uses a GitHub repository
+###
+  git-credential-helper: yes
 
 phases:
-  install:
-    runtime-versions:
-      java: corretto11
   pre_build:
+###
+### Use DockerHub credentials to bypass anonymous pull limits
+### https://docs.docker.com/docker-hub/download-rate-limit
+###
     commands:
-      - liquibase --version
+      - echo $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
+###
+### Ensure liquibase user can update files
+###
+      - chmod 666 $CODEBUILD_SRC_DIR/*_$(LB_ENVIRONMENT).json
+
   build:
+    on-failure: ABORT
     commands:
-      - echo Build started on `date`
-      - liquibase --defaultsFile=liquibase.properties validate
-      - liquibase --defaultsFile=liquibase.properties tag codebuild-$CODEBUILD_BUILD_NUMBER
-      - liquibase --defaultsFile=liquibase.properties status --verbose
-      - liquibase --defaultsFile=liquibase.properties updateSql
-      - liquibase --defaultsFile=liquibase.properties update
-      - liquibase --defaultsFile=liquibase.properties history
-      
+###
+### Run the Liquibase flowfile
+### Liquibase should be installed where your agents run or invoked via Docker
+###
+      - docker run --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_PRO_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v $CODEBUILD_SRC_DIR:/liquibase/changelog liquibase/liquibase:latest flow --flow-file=liquibase.flowfile.yaml
+
   post_build:
     commands:
-      - liquibase --defaultsFile=liquibase.properties --outputFile=codebuild-$CODEBUILD_BUILD_NUMBER.json snapshot --snapshotFormat=json
-      - echo Build completed on `date`
-artifacts:
-  files:
-    - codebuild-$CODEBUILD_BUILD_NUMBER.json
+###
+### Update respository
+###
+      - git config --global user.name codebuild-actions
+      - git config --global user.email codebuild-actions@aws.com
+      - git add .
+      - git commit -m "Update snapshots."
+      - git push --force
