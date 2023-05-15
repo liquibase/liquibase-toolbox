@@ -1,63 +1,122 @@
-#!/usr/bin/env groovy
-// Liquibase declarative pipeline
-//
-//
+/*
+###
+### This sample pipeline is intended as a starting point for integration between Liquibase Pro and Jenkins pipelines
+### Review and update prior to use
+###
+### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase support: https://support.liquibase.com/knowledge
+### 
+
+###
+### Prior to running the following files must exist in repository:
+###
+### 1. liquibase.flowfile.yaml
+###    Liquibase flow file
+###    https://docs.liquibase.com/commands/flow/flow.html
+###
+### 2. liquibase.checks-settings.conf
+###    Liquibase quality checks configuration file
+###    https://docs.liquibase.com/commands/quality-checks/home.html
+###
+### 3. Snapshot_DEV.json
+###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
+###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
+###    https://docs.liquibase.com/commands/inspection/snapshot.html
+###
+### 4. changelog.main.xml
+###    Liquibase changelog file
+###    https://docs.liquibase.com/concepts/changelogs/home.html
+###
+*/
+
+/*
+###
+### Jenkins documentation: https://www.jenkins.io/doc/book/pipeline/jenkinsfile/
+###
+*/
+
+/*
+###
+### Utilizes a Linux node with git and docker available
+### https://www.jenkins.io/doc/book/managing/nodes/
+###
+*/
 pipeline {
-agent any
-  environment {
-    ENVIRONMENT_STEP="${params.step}"
-    TAG="${params.tag}"
-    PATH="/path/to/liquibase:$PATH"
-  }
-  stages {
+    agent { label 'liquibase' }
 
-    stage ('Checkout') {
-      steps {
-        // checkout Liquibase project from repo
-        sh '''
-          { set +x; } 2>/dev/null
-	  java -version
-          git status
-          '''
-      } // steps for checkout stages
-    } // stage 'checkout'
-
-   stage ('liquibase commands'){
-      steps {
-        sh '''
-          { set +x; } 2>/dev/null
-          liquibase --version
-          echo "------------------------------------"
-          echo "----------liquibase status----------"
-          echo "------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP status --verbose
-          echo "---------------------------------------"
-          echo "----------liquibase updateSQL----------"
-          echo "---------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP updateSQL
-          echo "---------------------------------------------"
-          echo "----------liquibase tag database with version1----------"
-          echo "---------------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP tag $TAG
-          echo "------------------------------------"
-          echo "----------liquibase update----------"
-          echo "------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP update
-          echo "------------------------------------------------------------"
-          echo "----------liquibase diff with upper QA environment----------"
-          echo "------------------------------------------------------------"
-          liquibase --referenceUrl=${URL} --referenceUsername=${USERNAME} --referencePassword=${PASSWORD} --url=$DIFF_URL --username=${DIFF_USERNAME} --password=${DIFF_PASSWORD} --contexts=$ENVIRONMENT_STEP diff
-          echo "---------------------------------------------"
-          echo "----------liquibase rollback to version1----------"
-          echo "---------------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP rollback $TAG
-	  echo "------------------------------------"
-          echo "----------liquibase update----------"
-          echo "------------------------------------"
-          liquibase --url=${URL} --username=${USERNAME} --password=${PASSWORD} --contexts=$ENVIRONMENT_STEP update
-        '''
-      } // steps
-    }   // Environment stage
-
-  } // stages
-}  // pipeline
+/*
+###
+### Set Liquibase environment variables
+###
+*/
+    environment {
+        LB_ENVIRONMENT = 'DEV'
+        LIQUIBASE_COMMAND_CHANGELOG_FILE = 'changelog.main.xml'
+        LIQUIBASE_COMMAND_TAG = '${BUILD_ID}'
+/*
+###
+### These values should be pulled from Jenkins secrets
+### Secrets should include LIQUIBASE_COMMAND_URL, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_PRO_LICENSE_KEY
+###
+*/
+        LIQUIBASE_COMMAND_URL = credentials('LIQUIBASE_DEV_URL')
+        LIQUIBASE_COMMAND_USERNAME = credentials('LIQUIBASE_DEV_USER')
+        LIQUIBASE_COMMAND_PASSWORD = credentials('LIQUIBASE_DEV_PASSWORD')
+        LIQUIBASE_PRO_LICENSE_KEY = credentials('LIQUIBASE_PROKEY')
+    }
+/*
+###
+### Checkout pipeline repository
+###
+*/
+    stages {
+        stage('Checking out repository') {
+            steps {
+/*
+###
+### Update to your project repository
+### Requires the git plugin for Jenkins
+### Github credentials are set as user/password type in Jenkins
+###
+*/
+                deleteDir()
+                checkout scmGit(branches: [[name: 'origin/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'LIQUIBASE_GITHUB_TOKEN', url: 'https://github.com/jbennett-liquibase/Toolbox']])
+                sh 'git switch main'
+            }
+        }
+/*
+###
+### Run the Liquibase flowfile
+### Requires the Docker plugin for Jenkins
+###
+*/
+        stage('Running Liquibase') {
+            agent {
+                docker {
+                    image 'liquibase/liquibase:latest'
+                    args '--env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_PRO_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v $WORKSPACE:/liquibase/changelog'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh 'liquibase flow --flow-file=liquibase.flowfile.yaml'
+            }
+        }
+/*
+###
+### Update respository
+###
+*/
+        stage('Updating repository') {
+            steps {
+                sh 'git config --global user.name jenkins-node'
+                sh 'git config --global user.email jenkins-node@jenkins.io'
+                sh 'git add .'
+                sh 'git commit -m "Update snapshots."'
+                withCredentials([gitUsernamePassword(credentialsId: 'LIQUIBASE_GITHUB_TOKEN', gitToolName: 'Default')]) {
+                    sh 'git push -u origin main --force'
+                }
+            }
+        }
+    }
+}

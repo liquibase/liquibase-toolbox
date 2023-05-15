@@ -1,43 +1,92 @@
-image: java:8
+###
+### This sample pipeline is intended as a starting point for integration between Liquibase Pro and GitLab pipelines
+### Review and update prior to use
+###
+### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase support: https://support.liquibase.com/knowledge
+### 
 
-build-job:
-  stage: build
-  script:
-    - echo "Liquibase latest version:" 
-    - curl -s -H "Accept:application/vnd.github.v3+json" https://api.github.com/repos/liquibase/liquibase/releases/latest | grep -o 'v.*' | grep -v '\"\,' | grep 'core.*jar' | sed s/'v'//g | sed s/'\/.*'//g
-    - $DOWNLOAD_LB
-    - $UNZIP_LB
-    - echo "Hello, $GITLAB_USER_LOGIN!"
-    - which java
-    - ./liquibase/liquibase --help
-    - ./liquibase/liquibase --changeLogFile=./H2_project/myChangeLog.xml --url=jdbc:h2:file:./H2_project/liquibase_test --logLevel=info status --verbose
+###
+### Prior to running the following files must exist in repository:
+###
+### 1. liquibase.flowfile.yaml
+###    Liquibase flow file
+###    https://docs.liquibase.com/commands/flow/flow.html
+###
+### 2. liquibase.checks-settings.conf
+###    Liquibase quality checks configuration file
+###    https://docs.liquibase.com/commands/quality-checks/home.html
+###
+### 3. Snapshot_DEV.json
+###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
+###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
+###    https://docs.liquibase.com/commands/inspection/snapshot.html
+###
+### 4. changelog.main.xml
+###    Liquibase changelog file
+###    https://docs.liquibase.com/concepts/changelogs/home.html
+###
 
-test-job1:
-  stage: test
-  script:
-    - $DOWNLOAD_LB
-    - $UNZIP_LB
-    - echo "This job tests liquibase update in test environment"
-    - ./liquibase/liquibase --changeLogFile=./H2_project/myChangeLog.xml --url=jdbc:h2:file:./H2_project/liquibase_test --logLevel=info update
+###
+### GitLab documentation: https://docs.gitlab.com/ee/ci/yaml/gitlab_ci_yaml.html
+###
 
-test-job2:
-  stage: test
-  script:
-    - $DOWNLOAD_LB
-    - $UNZIP_LB
-    - echo "This job tests liquibase rollback in test environment"
-    - ./liquibase/liquibase --changeLogFile=./H2_project/myChangeLog.xml --url=jdbc:h2:file:./H2_project/liquibase_test --logLevel=info update
-    - ./liquibase/liquibase --changeLogFile=./H2_project/myChangeLog.xml --url=jdbc:h2:file:./H2_project/liquibase_test --logLevel=info rollbackCount 1
+stages:
+  - Liquibase
 
-deploy-prod:
-  stage: deploy
-  script:
-    - $DOWNLOAD_LB
-    - $UNZIP_LB
-    - echo "This job deploys Liquibase in a production environment from the $CI_COMMIT_BRANCH branch."
-    - ./liquibase/liquibase --changeLogFile=./H2_project/myChangeLog.xml --url=jdbc:h2:file:./H2_project/liquibase_prod --logLevel=info update
+###
+### Utilizes a local Linux runner with git and docker available
+### https://docs.gitlab.com/runner/register/index.html
+###
+default:
+  tags:
+    - liquibase
 
+###
+### Set Liquibase environment variables
+###
 variables:
-  VERSION: "4.2.2"
-  DOWNLOAD_LB: "curl -L https://github.com/liquibase/liquibase/releases/download/v${VERSION}/liquibase-${VERSION}.zip --output liquibase-${VERSION}.zip"
-  UNZIP_LB: "unzip -o -d liquibase liquibase-${VERSION}.zip"
+    LB_ENVIRONMENT: "DEV"
+    LIQUIBASE_COMMAND_CHANGELOG_FILE: "changelog.main.xml"
+    LIQUIBASE_COMMAND_TAG: $CI_JOB_ID
+###
+### These values should be pulled from pipeline variables or vault
+### Secrets should include LIQUIBASE_PRO_LICENSE_KEY, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_COMMAND_URL
+###
+    LIQUIBASE_COMMAND_URL: $LIQUIBASE_DEV_URL
+    LIQUIBASE_COMMAND_USERNAME: $LIQUIBASE_DEV_USER
+    LIQUIBASE_COMMAND_PASSWORD: $LIQUIBASE_DEV_PASSWORD
+    LIQUIBASE_PRO_LICENSE_KEY: $LIQUIBASE_PROKEY
+
+run-liquibase:
+  stage: Liquibase
+###
+### Pipelines can be triggered manually or via events
+###
+  when: manual
+  script:
+###
+### Checkout repository
+###
+    - echo "Checking out repository"
+    - git switch main
+    - git pull
+###
+### Run the Liquibase flowfile
+### Liquibase should be installed where your agents run or invoked via Docker
+###
+    - echo "Running Liquibase"
+    - docker run --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_PRO_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v $(pwd):/liquibase/changelog liquibase/liquibase:latest flow --flow-file=liquibase.flowfile.yaml
+###
+### Update to your project repository
+###
+    - git remote set-url origin https://$GITLAB_USER_ID:$LIQUIBASE_GITLAB_TOKEN@gitlab.com/liquibase3/Toolbox.git
+###
+### Update respository
+###
+    - echo "Updating repository"
+    - git config --global user.name gitlab-runner
+    - git config --global user.email gitlab-runner@gitlab.com
+    - git add .
+    - git commit -m "[ci skip] Update snapshots."
+    - git push --force
