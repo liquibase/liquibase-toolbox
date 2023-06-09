@@ -18,9 +18,9 @@ This repository contains working examples of Liquibase running with various auto
 
 # Methodology
 Each pipeline will perform the following steps:
-* Checkout source code repository
-* Execute Liquibase flow via Docker
-* Update source code respository with the new Snapshot file (used for drift detection)
+1. Checkout source code repository
+1. Execute Liquibase flow via Docker
+1. Update source code respository with the new Snapshot file (used for drift detection)
 
 Note for some pipelines, a personal access token was used to provide read/write access to the repository (e.g., GitHub Actions). The repository and access will have to be updated prior to use in your environment.
 
@@ -29,43 +29,39 @@ Note for some pipelines, a personal access token was used to provide read/write 
 * Pro-only features utilized
 * Docker container utilized (https://hub.docker.com/r/liquibase/liquibase)
 * Git based repository utilized
-* Local runners utilized when noted
+* Local agents/runners utilized where noted
 * Required environment variables defined in configuration file or pipeline itself
 * Credentials pulled from secure location
 
 # Required Environment Variables
-The following environment variables must be defined and passed in to the Docker image.
-### LB_ENVIRONMENT
-The environment the pipeline is running against (e.g., DEV, TEST, PROD). By default, diff and snapshot files are created with this variable in the name.
-### LIQUIBASE_COMMAND_CHANGELOG_FILE
-The changelog file to process. Typically, a main file is invoked which calls other changelog files. https://docs.liquibase.com/concepts/changelogs/home.html
-### LIQUIBASE_COMMAND_TAG
-A unique identifier to tag the database. By default, the pipeline build/job number is used.
-### LIQUIBASE_COMMAND_URL (secret)
-The JDBC URL of the target database.
-### LIQUIBASE_COMMAND_USERNAME (secret)
-The user ID for the target database.
-### LIQUIBASE_COMMAND_PASSWORD (secret)
-The user password for the target database.
-### LIQUIBASE_PRO_LICENSE_KEY (secret)
-A valid Liquibase Pro license key.
+The following environment variables must be defined and passed in to the Liquibase Docker container. If running Liquibase locally, these need to be set prior to invocation.
+| Variable | Secret | Description |
+|----------|   :---:   |------------|
+| LB_ENVIRONMENT | | The environment the pipeline is running against (e.g., DEV, TEST, PROD). By default, diff and snapshot files are created with this variable in the name.
+| LIQUIBASE_COMMAND_CHANGELOG_FILE | | The changelog file to process. Typically, a main file is invoked which calls other changelog files. https://docs.liquibase.com/concepts/changelogs/home.html
+| LIQUIBASE_COMMAND_TAG | | A unique identifier to tag the database. By default, the pipeline build/job number is used.
+| LIQUIBASE_COMMAND_URL | x | The JDBC URL of the target database.
+| LIQUIBASE_COMMAND_USERNAME | x | The user ID for the target database.
+| LIQUIBASE_COMMAND_PASSWORD | x | The user password for the target database.
+| LIQUIBASE_PRO_LICENSE_KEY | x | A valid Liquibase Pro license key.
 
 # Required Files
 The following files must be located in the source code repository for these pipelines to execute successfully.
-1. liquibase.flowfile.yaml (flow file)
+| File name | Description | Documentation
+|----------|------------|-------------|
+| changelog.main.xml | Main changelog file | https://docs.liquibase.com/concepts/changelogs/home.html
+| liquibase.flowfile.yaml | Flow file | https://docs.liquibase.com/commands/flow/flow.html
+| liquibase.checks-settings.conf | Quality checks configuration | https://docs.liquibase.com/commands/quality-checks/home.html
+| Snapshot_DEV.json | Initial snapshot file | https://docs.liquibase.com/commands/inspection/snapshot.html
 
-   https://docs.liquibase.com/commands/flow/flow.html
-1. liquibase.checks-settings.conf (quality checks configuration)
-
-   https://docs.liquibase.com/commands/quality-checks/home.html
-1. Snapshot_DEV.json (initial snapshot file)
-
-   Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
-
-   https://docs.liquibase.com/commands/inspection/snapshot.html
-1. changelog.main.xml (main changelog file)
-
-   https://docs.liquibase.com/concepts/changelogs/home.html
+To create the initial quality checks file:
+```
+liquibase checks show
+```
+To create the initial snapshot file:
+```
+liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
+```
 
 # Contact Liquibase
 #### Liquibase sales: https://www.liquibase.com/contact
