@@ -33,6 +33,15 @@
 
 version: 2.1
  
+###
+### Pipelines can be triggered manually or via events
+### This pipeline will only run if "skip_deploy" parameter is false (used for testing only)
+###
+parameters:
+  skip_deploy:
+    type: boolean
+    default: true
+
 jobs:
   liquibase-job:
     machine:
@@ -50,6 +59,9 @@ jobs:
 ###
 ### These should be pulled from environment variables or vault
 ### Secrets should include LIQUIBASE_COMMAND_URL, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_PRO_LICENSE_KEY
+###
+### The secrets Liquibase requires could also be set directly using pipeline environment variables
+### i.e., instead of of assigning LIQUIBASE_COMMAND_URL the value of LB_DEV_URL, use a pipeline environment variable named LIQUIBASE_COMMAND_URL
 ###
       - run:
           name: Setup Environment Variables
@@ -81,5 +93,6 @@ jobs:
 
 workflows:
   liquibase-workflow:
+    unless: << pipeline.parameters.skip_deploy >>
     jobs:
       - liquibase-job
