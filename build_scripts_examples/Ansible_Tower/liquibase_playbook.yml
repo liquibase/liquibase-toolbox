@@ -1,0 +1,91 @@
+###
+### This sample pipeline is intended as a starting point for integration between Liquibase Pro and Ansible
+### Review and update prior to use
+###
+### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase support: https://support.liquibase.com/knowledge
+### 
+
+###
+### Prior to running the following files must exist in repository:
+###
+### 1. liquibase.flowfile.yaml
+###    Liquibase flow file
+###    https://docs.liquibase.com/commands/flow/flow.html
+###
+### 2. liquibase.checks-settings.conf
+###    Liquibase quality checks configuration file
+###    https://docs.liquibase.com/commands/quality-checks/home.html
+###
+### 3. Snapshot_DEV.json
+###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
+###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
+###    https://docs.liquibase.com/commands/inspection/snapshot.html
+###
+### 4. changelog.main.xml
+###    Liquibase changelog file
+###    https://docs.liquibase.com/concepts/changelogs/home.html
+###
+
+###
+### Ansible documentation: https://docs.ansible.com/
+###
+
+---
+
+- name: Running Liquibase
+  hosts: localhost
+  vars:
+    LB_TMP_DIR: /tmp/Toolbox
+  tasks:
+###
+### Checkout repository
+### This example uses a personal access token, adjust as required
+###
+    - name: Checking out repository
+      ansible.builtin.git:
+        repo: "https://{{ GITHUB_TOKEN }}@github.com/jbennett-liquibase/Toolbox.git"
+        dest: "{{ LB_TMP_DIR }}"
+ 
+###
+### Ensure ansible user can update files
+###
+    - name: Updating permissions
+      shell: |
+        chmod 666 {{ LB_TMP_DIR }}/Diff_*.json
+        chmod 666 {{ LB_TMP_DIR }}/Snapshot_*.json
+
+###
+### Run the Liquibase flowfile
+### Liquibase should be installed where your playbooks run or invoked via Docker
+###
+    - name: Running Liquibase
+      shell: |
+        docker run --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_PRO_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v {{ LB_TMP_DIR }}:/liquibase/changelog liquibase/liquibase:latest flow --flow-file=liquibase.flowfile.yaml
+      environment:
+###
+### Set Liquibase environment variables
+###
+        LB_ENVIRONMENT: DEV
+        LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.main.xml
+        LIQUIBASE_COMMAND_TAG: "{{ ansible_date_time.iso8601_basic }}"
+###
+### These values should be pulled from pipeline variables or vault
+### Secrets should include LIQUIBASE_PRO_LICENSE_KEY, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_COMMAND_URL
+###
+        LIQUIBASE_COMMAND_URL: "{{ LIQUIBASE_DEV_URL }}"
+        LIQUIBASE_COMMAND_USERNAME: "{{ LIQUIBASE_DEV_USER }}"
+        LIQUIBASE_COMMAND_PASSWORD: "{{ LIQUIBASE_DEV_PASSWORD }}"
+        LIQUIBASE_PRO_LICENSE_KEY: "{{ LIQUIBASE_PROKEY }}"
+
+###
+### Update respository
+###
+    - name: Updating repository
+      shell: |
+        cd "{{ LB_TMP_DIR }}"
+        git config --global user.name ansible-user
+        git config --global user.email ansible-users@ansible.com
+        git add .
+        git commit -m "Update snapshots."
+        git push --force
