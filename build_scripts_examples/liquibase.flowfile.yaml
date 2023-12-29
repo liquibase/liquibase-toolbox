@@ -17,13 +17,8 @@
 ###    Liquibase quality checks configuration file
 ###    https://docs.liquibase.com/commands/quality-checks/home.html
 ###
-### 3. Snapshot_DEV.json
-###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
-###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
-###    https://docs.liquibase.com/commands/inspection/snapshot.html
-###
-### 4. changelog.main.xml
-###    Liquibase changelog file
+### 3. changelog.main.xml
+###    Root Liquibase changelog file
 ###    https://docs.liquibase.com/concepts/changelogs/home.html
 ###
 
@@ -34,26 +29,68 @@ globalVariables:
   ###
   ### These variables are typically set via automation tools (see pipeline examples)
   ###
-  ### Environment setup
-  ### LIQUIBASE_COMMAND_TAG should be a unique identifier e.g. job/build number
+  ### LIQUIBASE_SEARCH_PATH: REQUIRED
+  ### Use absolute paths when using Liquibase's Docker container
+  ### LIQUIBASE_SEARCH_PATH: "/liquibase/changelog"
   ###
-  ### LB_ENVIRONMENT
-  ### LIQUIBASE_COMMAND_TAG
+  ### LIQUIBASE_COMMAND_CHANGELOG_FILE: REQUIRED
+  ### Root Liquibase changelog file
+  ### LIQUIBASE_COMMAND_CHANGELOG_FILE: "changelog.main.xml"
   ###
-  ### Secrets
-  ### These values should be pulled from a secure vault
+  ### LIQUIBASE_COMMAND_TAG: REQUIRED
+  ### Should be a unique identifier e.g. job/build number
+  ### LIQUIBASE_COMMAND_TAG: "12345"
   ###
-  ### LIQUIBASE_COMMAND_URL
-  ### LIQUIBASE_COMMAND_USERNAME
-  ### LIQUIBASE_COMMAND_PASSWORD
-  ### LIQUIBASE_PRO_LICENSE_KEY
+  ### LB_ENVIRONMENT: REQUIRED
+  ### LB_ENVIRONMENT should be the environment within the pipeline to operate on (e.g., DEV, UAT, PROD)
+  ### LB_ENVIRONMENT: "DEV"
+  ###
+  ### Secrets: REQUIRED
+  ### These values should be pulled from a secure vault via pipeline or Liquibase Pro extension
+  ### https://docs.liquibase.com/tools-integrations/extensions/secrets-management/home.html
+  ###
+  ### LIQUIBASE_COMMAND_URL: "jdbc:h2:tcp://localhost:9090/mem:dev"
+  ### LIQUIBASE_COMMAND_USERNAME: "dbuser"
+  ### LIQUIBASE_COMMAND_PASSWORD: "letmein"
+  ### LIQUIBASE_LICENSE_KEY: "12345"
+  ###
+  ### Structured logging
+  ### Liquibase logs can be ingested by any standard observability tool (e.g., CloudWatch, Datadog, Elastic, Splunk)
+  ### https://docs.liquibase.com/tools-integrations/observability/structured-logging.html
+  ###
+  ### LIQUIBASE_LOG_FILE: "liquibase.log.json"
+  ### LIQUIBASE_LOG_FORMAT: "json"
+  ### LIQUIBASE_LOG_LEVEL: "WARNING"
+  ### LIQUIBASE_MIRROR_CONSOLE_MESSAGES_TO_LOG: "false"
+  ###
+  ### Other settings
+  ### LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_OUTPUT: "issues"
+  ### LIQUIBASE_SHOW_BANNER: "false"
   ###
   ### Files
-  ### Use absolute paths when using Liquibase's Docker container
   ###
-  BASE_DIR: "/liquibase/changelog"
+  BASE_DIR: "${LIQUIBASE_SEARCH_PATH}"
   DIFF_FILE: "${BASE_DIR}/Diff_${LB_ENVIRONMENT}.json"
   SNAPSHOT_FILE: "Snapshot_${LB_ENVIRONMENT}.json"
+  ###
+  ### Reports
+  ### Liquibase Pro creates summary reports for certain operations
+  ### https://docs.liquibase.com/tools-integrations/observability/operation-reports.html
+  ###
+  DRIFT_REPORT: "Diff_${LB_ENVIRONMENT}.html"
+  UPDATE_REPORT: "Update_${LB_ENVIRONMENT}.html"
+  ###
+  ### Workflow features
+  ### Set these flags to T/F to turn Liquibase Pro features on/off
+  LB_TEST_CHECKS: "T"
+  LB_TEST_DRIFT: "T"
+  LB_TEST_ROLLBACKS: "T"
+  ###
+  ### LB_CREATE_SNAPSHOT should be set to "F" after the initial pipeline run (future release of Liquibase can determine this at runtime)
+  ### Windows - LB_CREATE_SNAPSHOT: "`IF EXIST ${BASE_DIR}/${SNAPSHOT_FILE} (ECHO F) ELSE (ECHO T)`"
+  ### Linux - LB_CREATE_SNAPSHOT: "`if [ -f ${BASE_DIR}/${SNAPSHOT_FILE} ]; then echo F ; else echo T ; fi`"
+  ###
+  LB_CREATE_SNAPSHOT: "T"
 
 ###
 ### Stages to execute
@@ -61,6 +98,11 @@ globalVariables:
 stages:
   Default:
     actions:
+      #
+      # Validate database connection (future)
+      #
+      # - type: liquibase
+      #   command: connect
       #
       # Validate changelog
       #
@@ -76,29 +118,33 @@ stages:
       # Show quality checks
       #
       - type: liquibase
+        if: "${LB_TEST_CHECKS} == T"
         command: checks show
       #
       #
       # Run quality checks
       #
       - type: liquibase
+        if: "${LB_TEST_CHECKS} == T"
         command: checks run
         cmdArgs: { checks-scope: "changelog, database" }
       #
-      # Run diff
-      # Update database type in cmdArgs (e.g., oracle, mssql, etc.)
+      # Create initial snapshot
       #
       - type: liquibase
+        if: "${LB_CREATE_SNAPSHOT} == T"
+        command: snapshot
+        globalArgs: { outputfile: "${BASE_DIR}/${SNAPSHOT_FILE}" }
+        cmdArgs: { snapshotFormat: "json" }
+      #
+      # Run diff and check for drift
+      # Update database type in cmdArgs (e.g., oracle, mssql, snowflake, etc.)
+      #
+      - type: liquibase
+        if: "${LB_TEST_DRIFT} == T"
         command: diff
         globalArgs: { outputfile: "${DIFF_FILE}" }
-        cmdArgs: { referenceURL: "offline:snowflake?snapshot=${SNAPSHOT_FILE}", format: json }
-      #
-      # Check for drift
-      # findstr for Windows agents, grep for Linux (and Liquibase's Docker container)
-      #
-      - type: shell
-        #command: findstr /i /r "unexpected missing changed" ${DIFF_FILE} 1>nul 2>&1 & if ERRORLEVEL 1 (exit 0) else (exit 1)
-        command: grep -E "unexpected|missing|changed" ${DIFF_FILE} >> /dev/null 2>&1 ; if [ $? -eq 0 ]; then exit 1; else exit 0; fi
+        cmdArgs: { drift-severity: "1", report-enabled: "true", report-path: "${BASE_DIR}", report-name: "${DRIFT_REPORT}", referenceURL: "offline:snowflake?snapshot=${SNAPSHOT_FILE}", format: json }
       #
       # Tag the database
       #
@@ -115,28 +161,29 @@ stages:
       #
       - type: liquibase
         command: update
+        cmdArgs: { report-enabled: "true", report-path: "${BASE_DIR}", report-name: "${UPDATE_REPORT}" }
       #
       # Test rollbacks
-      # Non-production only
+      # Typically non-production only
       #
       - type: liquibase
-        if: "${LB_ENVIRONMENT} != PROD"
+        if: "${LB_TEST_ROLLBACKS} == T"
         command: rollbackSQL
         cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
       #
       # Test rollbacks
-      # Non-production only
+      # Typically non-production only
       #
       - type: liquibase
-        if: "${LB_ENVIRONMENT} != PROD"
+        if: "${LB_TEST_ROLLBACKS} == T"
         command: rollback
         cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
       #
       # Test rollbacks
-      # Non-production only
+      # Typically non-production only
       #
       - type: liquibase
-        if: "${LB_ENVIRONMENT} != PROD"
+        if: "${LB_TEST_ROLLBACKS} == T"
         command: update
       #
       # Create updated snapshot
