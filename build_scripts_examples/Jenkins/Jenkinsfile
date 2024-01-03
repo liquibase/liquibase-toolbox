@@ -7,24 +7,19 @@
 ### Liquibase support: https://support.liquibase.com/knowledge
 ### 
 
-###
+### 
 ### Prior to running the following files must exist in repository:
 ###
 ### 1. liquibase.flowfile.yaml
-###    Liquibase flow file
+###    This flow file
 ###    https://docs.liquibase.com/commands/flow/flow.html
 ###
 ### 2. liquibase.checks-settings.conf
 ###    Liquibase quality checks configuration file
 ###    https://docs.liquibase.com/commands/quality-checks/home.html
 ###
-### 3. Snapshot_DEV.json
-###    Initial snapshot file for target database (will be updated as part of the Liquibase flow)
-###    Run: liquibase snapshot --outputfile="Snapshot_DEV.json" --snapshotformat=json
-###    https://docs.liquibase.com/commands/inspection/snapshot.html
-###
-### 4. changelog.main.xml
-###    Liquibase changelog file
+### 3. changelog.main.xml
+###    Root Liquibase changelog file
 ###    https://docs.liquibase.com/concepts/changelogs/home.html
 ###
 */
@@ -56,13 +51,13 @@ pipeline {
 /*
 ###
 ### These values should be pulled from Jenkins secrets
-### Secrets should include LIQUIBASE_COMMAND_URL, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_PRO_LICENSE_KEY
+### Secrets should include LIQUIBASE_COMMAND_URL, LIQUIBASE_COMMAND_USERNAME, LIQUIBASE_COMMAND_PASSWORD, LIQUIBASE_LICENSE_KEY
 ###
 */
         LIQUIBASE_COMMAND_URL = credentials('LIQUIBASE_DEV_URL')
         LIQUIBASE_COMMAND_USERNAME = credentials('LIQUIBASE_DEV_USER')
         LIQUIBASE_COMMAND_PASSWORD = credentials('LIQUIBASE_DEV_PASSWORD')
-        LIQUIBASE_PRO_LICENSE_KEY = credentials('LIQUIBASE_PROKEY')
+        LIQUIBASE_LICENSE_KEY = credentials('LIQUIBASE_KEY')
     }
 /*
 ###
@@ -94,7 +89,7 @@ pipeline {
             agent {
                 docker {
                     image 'liquibase/liquibase:latest'
-                    args '--env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_PRO_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v $WORKSPACE:/liquibase/changelog'
+                    args '--env LIQUIBASE_SEARCH_PATH=/liquibase/changelog --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v $WORKSPACE:/liquibase/changelog'
                     reuseNode true
                 }
             }
@@ -112,7 +107,7 @@ pipeline {
                 sh 'git config --global user.name jenkins-node'
                 sh 'git config --global user.email jenkins-node@jenkins.io'
                 sh 'git add .'
-                sh 'git commit -m "Update snapshots."'
+                sh 'git commit -m "Update repository"'
                 withCredentials([gitUsernamePassword(credentialsId: 'LIQUIBASE_GITHUB_TOKEN', gitToolName: 'Default')]) {
                     sh 'git push -u origin main --force'
                 }
