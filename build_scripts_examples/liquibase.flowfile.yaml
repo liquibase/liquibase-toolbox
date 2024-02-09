@@ -1,13 +1,15 @@
 ###
-### This flowfile is intended to highlight best practices utilizing Liquibase Pro
+### This flowfile is intended to highlight capabilities of Liquibase Pro
 ### Review and update prior to use
 ###
-### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase version: 4.26.0+
+###
+### Liquibase sales: https://www.liquibase.com/contact-us
 ### Liquibase support: https://support.liquibase.com/knowledge
 ###
 
 ### 
-### Prior to running the following files must exist in repository:
+### Prior to running the following files must exist in the LIQUIBASE_SEARCH_PATH (see below)
 ###
 ### 1. liquibase.flowfile.yaml
 ###    This flow file
@@ -60,7 +62,7 @@ globalVariables:
   ###
   ### LIQUIBASE_LOG_FILE: "liquibase.log.json"
   ### LIQUIBASE_LOG_FORMAT: "json"
-  ### LIQUIBASE_LOG_LEVEL: "WARNING"
+  ### LIQUIBASE_LOG_LEVEL: "warning"
   ### LIQUIBASE_MIRROR_CONSOLE_MESSAGES_TO_LOG: "false"
   ###
   ### Other settings
@@ -70,27 +72,25 @@ globalVariables:
   ### Files
   ###
   BASE_DIR: "${LIQUIBASE_SEARCH_PATH}"
-  DIFF_FILE: "${BASE_DIR}/Diff_${LB_ENVIRONMENT}.json"
+  DIFF_FILE: "Diff_${LB_ENVIRONMENT}.json"
   SNAPSHOT_FILE: "Snapshot_${LB_ENVIRONMENT}.json"
   ###
-  ### Reports
-  ### Liquibase Pro creates summary reports for certain operations
+  ### Operation Reports
+  ### Liquibase Pro creates reports for certain operations
+  ### These reports can be copied to a shared location for distribution
   ### https://docs.liquibase.com/tools-integrations/observability/operation-reports.html
   ###
+  CHECKS_REPORT: "Checks_${LB_ENVIRONMENT}.html"
   DRIFT_REPORT: "Diff_${LB_ENVIRONMENT}.html"
   UPDATE_REPORT: "Update_${LB_ENVIRONMENT}.html"
   ###
   ### Workflow features
   ### Set these flags to T/F to turn Liquibase Pro features on/off
+  ### These flags can also be set dynamically by an automation tool based on user input, environment, team, etc.
+  ### 
   LB_TEST_CHECKS: "T"
   LB_TEST_DRIFT: "T"
   LB_TEST_ROLLBACKS: "T"
-  ###
-  ### LB_CREATE_SNAPSHOT should be set to "F" after the initial pipeline run (future release of Liquibase can determine this at runtime)
-  ### Windows - LB_CREATE_SNAPSHOT: "`IF EXIST ${BASE_DIR}/${SNAPSHOT_FILE} (ECHO F) ELSE (ECHO T)`"
-  ### Linux - LB_CREATE_SNAPSHOT: "`if [ -f ${BASE_DIR}/${SNAPSHOT_FILE} ]; then echo F ; else echo T ; fi`"
-  ###
-  LB_CREATE_SNAPSHOT: "T"
 
 ###
 ### Stages to execute
@@ -127,23 +127,15 @@ stages:
       - type: liquibase
         if: "${LB_TEST_CHECKS} == T"
         command: checks run
-        cmdArgs: { checks-scope: "changelog, database" }
-      #
-      # Create initial snapshot
-      #
-      - type: liquibase
-        if: "${LB_CREATE_SNAPSHOT} == T"
-        command: snapshot
-        globalArgs: { outputfile: "${BASE_DIR}/${SNAPSHOT_FILE}" }
-        cmdArgs: { snapshotFormat: "json" }
+        cmdArgs: { report-enabled: "true", report-path: "${BASE_DIR}", report-name: "${CHECKS_REPORT}", checks-scope: "changelog, database" }
       #
       # Run diff and check for drift
-      # Update database type in cmdArgs (e.g., oracle, mssql, snowflake, etc.)
+      # Update referenceURL database type in cmdArgs (e.g., oracle, mssql, snowflake, etc.)
       #
       - type: liquibase
-        if: "${LB_TEST_DRIFT} == T"
+        if: "exists('${SNAPSHOT_FILE}', false) && ${LB_TEST_DRIFT} == 'T'"
         command: diff
-        globalArgs: { outputfile: "${DIFF_FILE}" }
+        globalArgs: { outputfile: "${BASE_DIR}/${DIFF_FILE}" }
         cmdArgs: { drift-severity: "1", report-enabled: "true", report-path: "${BASE_DIR}", report-name: "${DRIFT_REPORT}", referenceURL: "offline:snowflake?snapshot=${SNAPSHOT_FILE}", format: json }
       #
       # Tag the database
@@ -167,7 +159,7 @@ stages:
       # Typically non-production only
       #
       - type: liquibase
-        if: "${LB_TEST_ROLLBACKS} == T"
+        if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: rollbackSQL
         cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
       #
@@ -175,7 +167,7 @@ stages:
       # Typically non-production only
       #
       - type: liquibase
-        if: "${LB_TEST_ROLLBACKS} == T"
+        if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: rollback
         cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
       #
@@ -183,7 +175,7 @@ stages:
       # Typically non-production only
       #
       - type: liquibase
-        if: "${LB_TEST_ROLLBACKS} == T"
+        if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: update
       #
       # Create updated snapshot

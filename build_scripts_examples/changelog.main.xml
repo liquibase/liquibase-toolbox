@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>	
+<!--
+  This file is a sample Liquibase changelog
+  Liquibase changelogs can be formatted in SQL, Native Mongo, XML, JSON, and YAML
+  https://docs.liquibase.com/concepts/changelogs/home.html
+-->
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet id="1" author="jbennett" labels="jira-1218,release-1.0.0">
+        <createTable tableName="BusinessUnit">
+            <column name="ID" type="int">
+              <constraints primaryKey="true"/>
+            </column>
+            <column name="Name" type="string"/>
+            <column name="ModifiedDate" type="date"/> 
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="jbennett" labels="jira-1218,release-1.0.0">
+      <insert tableName="BusinessUnit">
+        <column name="ID" value="1"/>
+        <column name="Name" value="Explosives"/>
+        <column name="ModifiedDate" valueComputed="current_datetime"/>
+      </insert>
+      <insert tableName="BusinessUnit">
+        <column name="ID" value="2"/>
+        <column name="Name" value="Glue"/>
+        <column name="ModifiedDate" valueComputed="current_datetime"/>
+      </insert>
+      <insert tableName="BusinessUnit">
+        <column name="ID" value="3"/>
+        <column name="Name" value="Anvils"/>
+        <column name="ModifiedDate" valueComputed="current_datetime"/>
+      </insert>
+      <insert tableName="BusinessUnit">
+        <column name="ID" value="4"/>
+        <column name="Name" value="Appliances"/>
+        <column name="ModifiedDate" valueComputed="current_datetime"/>
+      </insert>
+      <insert tableName="BusinessUnit">
+        <column name="ID" value="5"/>
+        <column name="Name" value="Rockets"/>
+        <column name="ModifiedDate" valueComputed="current_datetime"/>
+      </insert>
+      <rollback>
+        <sql>DELETE FROM BusinessUnit WHERE ID BETWEEN 1 AND 5</sql>
+      </rollback>
+    </changeSet>
+
+</databaseChangeLog>
