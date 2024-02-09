@@ -2,7 +2,9 @@
 ### This sample pipeline is intended as a starting point for integration between Liquibase Pro and GitHub pipelines
 ### Review and update prior to use
 ###
-### Liquibase sales: https://www.liquibase.com/contact
+### Liquibase version: 4.26.0+
+###
+### Liquibase sales: https://www.liquibase.com/contact-us
 ### Liquibase support: https://support.liquibase.com/knowledge
 ### 
 
@@ -70,7 +72,7 @@ jobs:
 ### Liquibase should be installed where your agents run or invoked via Docker
 ###
     - name: Running Liquibase
-      run: docker run --env LIQUIBASE_SEARCH_PATH=/liquibase/changelog --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v ${{ github.workspace }}:/liquibase/changelog liquibase/liquibase:latest flow --flow-file=liquibase.flowfile.yaml
+      run: docker run --env LIQUIBASE_SEARCH_PATH=/liquibase/changelog --env LB_BASE_DIR=/liquibase/changelog --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LIQUIBASE_COMMAND_TAG --env LB_ENVIRONMENT --rm -v ${{ github.workspace }}:/liquibase/changelog liquibase/liquibase:latest flow --flow-file=liquibase.flowfile.yaml
 ###
 ### Update respository
 ###

@@ -43,6 +43,10 @@ globalVariables:
   ### Should be a unique identifier e.g. job/build number
   ### LIQUIBASE_COMMAND_TAG: "12345"
   ###
+  ### LB_BASE_DIR: REQUIRED
+  ### The directory to write outputs from Liquibase
+  ### LB_BASE_DIR: "/liquibase/changelogs"
+  ###
   ### LB_ENVIRONMENT: REQUIRED
   ### LB_ENVIRONMENT should be the environment within the pipeline to operate on (e.g., DEV, UAT, PROD)
   ### LB_ENVIRONMENT: "DEV"
@@ -71,7 +75,6 @@ globalVariables:
   ###
   ### Files
   ###
-  BASE_DIR: "${LIQUIBASE_SEARCH_PATH}"
   DIFF_FILE: "Diff_${LB_ENVIRONMENT}.json"
   SNAPSHOT_FILE: "Snapshot_${LB_ENVIRONMENT}.json"
   ###
@@ -127,7 +130,7 @@ stages:
       - type: liquibase
         if: "${LB_TEST_CHECKS} == T"
         command: checks run
-        cmdArgs: { report-enabled: "true", report-path: "${BASE_DIR}", report-name: "${CHECKS_REPORT}", checks-scope: "changelog, database" }
+        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${CHECKS_REPORT}", checks-scope: "changelog, database" }
       #
       # Run diff and check for drift
       # Update referenceURL database type in cmdArgs (e.g., oracle, mssql, snowflake, etc.)
@@ -135,8 +138,8 @@ stages:
       - type: liquibase
         if: "exists('${SNAPSHOT_FILE}', false) && ${LB_TEST_DRIFT} == 'T'"
         command: diff
-        globalArgs: { outputfile: "${BASE_DIR}/${DIFF_FILE}" }
-        cmdArgs: { drift-severity: "1", report-enabled: "true", report-path: "${BASE_DIR}", report-name: "${DRIFT_REPORT}", referenceURL: "offline:snowflake?snapshot=${SNAPSHOT_FILE}", format: json }
+        globalArgs: { outputfile: "${LB_BASE_DIR}/${DIFF_FILE}" }
+        cmdArgs: { drift-severity: "1", report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${DRIFT_REPORT}", referenceURL: "offline:snowflake?snapshot=${SNAPSHOT_FILE}", format: json }
       #
       # Tag the database
       #
@@ -153,7 +156,7 @@ stages:
       #
       - type: liquibase
         command: update
-        cmdArgs: { report-enabled: "true", report-path: "${BASE_DIR}", report-name: "${UPDATE_REPORT}" }
+        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${UPDATE_REPORT}" }
       #
       # Test rollbacks
       # Typically non-production only
@@ -182,7 +185,7 @@ stages:
       #
       - type: liquibase
         command: snapshot
-        globalArgs: { outputfile: "${BASE_DIR}/${SNAPSHOT_FILE}" }
+        globalArgs: { outputfile: "${LB_BASE_DIR}/${SNAPSHOT_FILE}" }
         cmdArgs: { snapshotFormat: "json" }
 
 ###
