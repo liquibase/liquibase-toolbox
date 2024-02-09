@@ -9,7 +9,7 @@
 ###
 
 ### 
-### Prior to running the following files must exist in the LIQUIBASE_SEARCH_PATH (see below)
+### Prior to running the following files must exist in repository
 ###
 ### 1. liquibase.flowfile.yaml
 ###    This flow file
