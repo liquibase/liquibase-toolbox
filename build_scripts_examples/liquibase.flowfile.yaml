@@ -124,7 +124,6 @@ stages:
         if: "${LB_TEST_CHECKS} == T"
         command: checks show
       #
-      #
       # Run quality checks
       #
       - type: liquibase
