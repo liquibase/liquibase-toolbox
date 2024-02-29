@@ -41,11 +41,13 @@ The following environment variables must be defined and passed in to the Liquiba
 | LIQUIBASE_SEARCH_PATH | | The root directory where Liquibase files are stored.
 | LIQUIBASE_COMMAND_CHANGELOG_FILE | | The changelog file to process. Typically, a main file is invoked which calls other changelog files. https://docs.liquibase.com/concepts/changelogs/home.html
 | LIQUIBASE_COMMAND_TAG | | A unique identifier to tag the database. By default, the pipeline build/job number is used.
-| LB_ENVIRONMENT | | The environment the pipeline is running against (e.g., DEV, TEST, PROD). By default, diff and snapshot files are created with this variable in the name.
 | LIQUIBASE_COMMAND_URL | x | The JDBC URL of the target database.
 | LIQUIBASE_COMMAND_USERNAME | x | The user ID for the target database.
 | LIQUIBASE_COMMAND_PASSWORD | x | The user password for the target database.
 | LIQUIBASE_LICENSE_KEY | x | A valid Liquibase license key.
+| LB_BASE_DIR | | The directory where Liquibase will write files.
+| LB_ENVIRONMENT | | The environment the pipeline is running against (e.g., DEV, TEST, PROD). By default, diff and snapshot files are created with this variable in the name.
+
 
 # Required Files
 The following files must be located in the source code repository for these pipelines to execute successfully.
