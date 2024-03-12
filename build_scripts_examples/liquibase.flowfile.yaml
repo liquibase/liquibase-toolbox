@@ -40,11 +40,11 @@ globalVariables:
   ### LIQUIBASE_COMMAND_CHANGELOG_FILE: "changelog.main.xml"
   ###
   ### LIQUIBASE_COMMAND_TAG: REQUIRED
-  ### Should be a unique identifier e.g. job/build number
+  ### Should be a unique identifier and change each run (e.g., job/build number)
   ### LIQUIBASE_COMMAND_TAG: "12345"
   ###
   ### LB_BASE_DIR: REQUIRED
-  ### The directory to write outputs from Liquibase
+  ### The directory to write Liquibase output (e.g., logs, reports)
   ### LB_BASE_DIR: "/liquibase/changelogs"
   ###
   ### LB_ENVIRONMENT: REQUIRED
@@ -78,9 +78,9 @@ globalVariables:
   DIFF_FILE: "Diff_${LB_ENVIRONMENT}.json"
   SNAPSHOT_FILE: "Snapshot_${LB_ENVIRONMENT}.json"
   ###
-  ### Operation Reports
-  ### Liquibase Pro creates reports for certain operations
-  ### These reports can be copied to a shared location for distribution
+  ### Operational Reports
+  ### Liquibase Pro creates operational reports for certain commands
+  ### These reports can be copied to a shared location for distribution to users (e.g., S3)
   ### https://docs.liquibase.com/tools-integrations/observability/operation-reports.html
   ###
   CHECKS_REPORT: "Checks_${LB_ENVIRONMENT}.html"
@@ -90,7 +90,8 @@ globalVariables:
   ### Workflow features
   ### Set these flags to T/F to turn Liquibase Pro features on/off
   ### These flags can also be set dynamically by an automation tool based on user input, environment, team, etc.
-  ### 
+  ###
+  LB_SHOW_UPDATE_SQL: "F"
   LB_TEST_CHECKS: "T"
   LB_TEST_DRIFT: "T"
   LB_TEST_ROLLBACKS: "T"
@@ -102,37 +103,43 @@ stages:
   Default:
     actions:
       #
-      # Validate database connection (future)
+      # Validate database connection
+      # https://docs.liquibase.com/commands/change-tracking/connect.html
       #
-      # - type: liquibase
-      #   command: connect
+      - type: liquibase
+        command: connect
       #
       # Validate changelog
+      # https://docs.liquibase.com/commands/utility/validate.html
       #
       - type: liquibase
         command: validate
       #
       # View pending changes
+      # https://docs.liquibase.com/commands/change-tracking/status.html
       #
       - type: liquibase
         command: status
         cmdArgs: { verbose: "true" }
       #
       # Show quality checks
+      # https://docs.liquibase.com/commands/quality-checks/home.html
       #
       - type: liquibase
         if: "${LB_TEST_CHECKS} == T"
         command: checks show
       #
       # Run quality checks
+      # https://docs.liquibase.com/commands/quality-checks/home.html
       #
       - type: liquibase
         if: "${LB_TEST_CHECKS} == T"
         command: checks run
-        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${CHECKS_REPORT}", checks-scope: "changelog, database" }
+        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${CHECKS_REPORT}", checks-scope: "changelog, database", changeset-filter: "pending" }
       #
       # Run diff and check for drift
       # Update referenceURL database type in cmdArgs (e.g., oracle, mssql, snowflake, etc.)
+      # https://docs.liquibase.com/commands/inspection/diff.html
       #
       - type: liquibase
         if: "exists('${SNAPSHOT_FILE}', false) && ${LB_TEST_DRIFT} == 'T'"
@@ -140,18 +147,23 @@ stages:
         globalArgs: { outputfile: "${LB_BASE_DIR}/${DIFF_FILE}" }
         cmdArgs: { drift-severity: "1", report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${DRIFT_REPORT}", referenceURL: "offline:snowflake?snapshot=${SNAPSHOT_FILE}", format: json }
       #
-      # Tag the database
+      # Tag database
+      # https://docs.liquibase.com/commands/utility/tag.html
       #
       - type: liquibase
         command: tag
         cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
       #
       # Review pending changes
+      # SQL executed can be found in the update report
+      # https://docs.liquibase.com/commands/update/update-sql.html
       #
       - type: liquibase
-        command: updateSQL
+        if: "${LB_SHOW_UPDATE_SQL} == 'T'"
+        command: update-sql
       #
-      # Update the database
+      # Update database
+      # https://docs.liquibase.com/commands/update/update.html
       #
       - type: liquibase
         command: update
@@ -159,14 +171,16 @@ stages:
       #
       # Test rollbacks
       # Typically non-production only
+      # https://docs.liquibase.com/commands/rollback/rollback-sql.html
       #
       - type: liquibase
         if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
-        command: rollbackSQL
+        command: rollback-sql
         cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
       #
       # Test rollbacks
       # Typically non-production only
+      # https://docs.liquibase.com/commands/rollback/rollback-by-tag.html
       #
       - type: liquibase
         if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
@@ -175,12 +189,15 @@ stages:
       #
       # Test rollbacks
       # Typically non-production only
+      # https://docs.liquibase.com/commands/update/update.html
       #
       - type: liquibase
         if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: update
+        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${UPDATE_REPORT}" }
       #
       # Create updated snapshot
+      # https://docs.liquibase.com/commands/inspection/snapshot.html
       #
       - type: liquibase
         command: snapshot
@@ -192,5 +209,9 @@ stages:
 ###
 endStage:
   actions:
+    #
+    # Show deployed changes
+    # https://docs.liquibase.com/commands/change-tracking/history.html
+    #
     - type: liquibase
       command: history
