@@ -89,7 +89,7 @@ stages:
 ###
     - script: |
         git switch -c main
-        git remote set-url origin https://$LIQUIBASE_GITHUB_TOKEN@github.com/jbennett-liquibase/Toolbox.git
+        git remote set-url origin https://$LIQUIBASE_GITHUB_TOKEN@github.com/liquibase/liquibase-toolbox.git
         git config --global user.name ado-pipelines
         git config --global user.email ado-pipelines@microsoft.com
         git add .
