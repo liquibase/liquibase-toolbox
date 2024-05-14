@@ -2,7 +2,7 @@
 ### This flowfile is intended to highlight capabilities of Liquibase Pro
 ### Review and update prior to use
 ###
-### Liquibase version: 4.26.0+
+### Liquibase version: 4.27.0+
 ###
 ### Liquibase sales: https://www.liquibase.com/contact-us
 ### Liquibase support: https://support.liquibase.com/knowledge
@@ -73,6 +73,13 @@ globalVariables:
   ### LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_OUTPUT: "issues"
   ### LIQUIBASE_SHOW_BANNER: "false"
   ###
+  ### Label filters
+  ### Used to specify which changesets to deploy (defaults to all)
+  ### Set LB_LABELS variable from automation tool
+  ### https://docs.liquibase.com/concepts/changelogs/attributes/labels.html
+  ###
+  LB_LABELS: "${LB_LABELS:-null}"
+  ###
   ### Files
   ###
   DIFF_FILE: "Diff_${LB_ENVIRONMENT}.json"
@@ -85,6 +92,7 @@ globalVariables:
   ###
   CHECKS_REPORT: "Checks_${LB_ENVIRONMENT}.html"
   DRIFT_REPORT: "Diff_${LB_ENVIRONMENT}.html"
+  ROLLBACK_REPORT: "Rollback_${LB_ENVIRONMENT}.html"
   UPDATE_REPORT: "Update_${LB_ENVIRONMENT}.html"
   ###
   ### Workflow features
@@ -120,7 +128,7 @@ stages:
       #
       - type: liquibase
         command: status
-        cmdArgs: { verbose: "true" }
+        cmdArgs: { label-filter: "${LB_LABELS}", verbose: "true" }
       #
       # Show quality checks
       # https://docs.liquibase.com/commands/quality-checks/home.html
@@ -128,6 +136,7 @@ stages:
       - type: liquibase
         if: "${LB_TEST_CHECKS} == T"
         command: checks show
+        cmdArgs: { check-status: "enabled" }
       #
       # Run quality checks
       # https://docs.liquibase.com/commands/quality-checks/home.html
@@ -167,7 +176,7 @@ stages:
       #
       - type: liquibase
         command: update
-        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${UPDATE_REPORT}" }
+        cmdArgs: { label-filter: "${LB_LABELS}", report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${UPDATE_REPORT}" }
       #
       # Test rollbacks
       # Typically non-production only
@@ -185,7 +194,7 @@ stages:
       - type: liquibase
         if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: rollback
-        cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
+        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${ROLLBACK_REPORT}", tag: "${LIQUIBASE_COMMAND_TAG}" }
       #
       # Test rollbacks
       # Typically non-production only
@@ -194,7 +203,7 @@ stages:
       - type: liquibase
         if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: update
-        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${UPDATE_REPORT}" }
+        cmdArgs: { label-filter: "${LB_LABELS}", report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${UPDATE_REPORT}" }
       #
       # Create updated snapshot
       # https://docs.liquibase.com/commands/inspection/snapshot.html
