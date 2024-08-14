@@ -81,8 +81,8 @@
     - name: Updating repository
       shell: |
         cd "{{ LB_TMP_DIR }}"
-        git config --global user.name ansible-user
-        git config --global user.email ansible-users@ansible.com
+        git config user.name ansible-user
+        git config user.email ansible-users@ansible.com
         git add .
         git commit -m "Update repository"
         git push --force
