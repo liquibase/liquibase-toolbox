@@ -82,8 +82,8 @@ jobs:
       - run:
           name: Updating repository
           command: |
-            git config --global user.name circleci-pipeline
-            git config --global user.email circleci-pipeline@circleci.com
+            git config user.name circleci-pipeline
+            git config user.email circleci-pipeline@circleci.com
             git add .
             git commit -m "[skip ci] Update repository"
             git push --force

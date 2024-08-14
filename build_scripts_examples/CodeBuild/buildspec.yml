@@ -86,8 +86,8 @@ phases:
 ###
 ### Update respository
 ###
-      - git config --global user.name codebuild-actions
-      - git config --global user.email codebuild-actions@aws.com
+      - git config user.name codebuild-actions
+      - git config user.email codebuild-actions@aws.com
       - git add .
       - git commit -m "Update repository"
       - git push --force

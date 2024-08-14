@@ -106,8 +106,8 @@ pipeline {
 */
         stage('Updating repository') {
             steps {
-                sh 'git config --global user.name jenkins-node'
-                sh 'git config --global user.email jenkins-node@jenkins.io'
+                sh 'git config user.name jenkins-node'
+                sh 'git config user.email jenkins-node@jenkins.io'
                 sh 'git add .'
                 sh 'git commit -m "Update repository"'
                 withCredentials([gitUsernamePassword(credentialsId: 'LIQUIBASE_GITHUB_TOKEN', gitToolName: 'Default')]) {

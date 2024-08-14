@@ -82,8 +82,8 @@ run-liquibase:
 ### Update respository
 ###
     - echo "Updating repository"
-    - git config --global user.name gitlab-runner
-    - git config --global user.email gitlab-runner@gitlab.com
+    - git config user.name gitlab-runner
+    - git config user.email gitlab-runner@gitlab.com
     - git add .
     - git commit -m "[ci skip] Update repository"
     - git push --force
