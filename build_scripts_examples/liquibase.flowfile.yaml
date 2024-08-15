@@ -111,11 +111,11 @@ stages:
   Default:
     actions:
       #
-      # Validate database connection (future)
+      # Validate database connection
       # https://docs.liquibase.com/commands/change-tracking/connect.html
       #
-      # - type: liquibase
-      #   command: connect
+      - type: liquibase
+        command: connect
       #
       # Validate changelog
       # https://docs.liquibase.com/commands/utility/validate.html
