@@ -39,10 +39,6 @@ globalVariables:
   ### Root Liquibase changelog file
   ### LIQUIBASE_COMMAND_CHANGELOG_FILE: "changelog.main.xml"
   ###
-  ### LIQUIBASE_COMMAND_TAG: REQUIRED
-  ### Should be a unique identifier and change each run (e.g., job/build number)
-  ### LIQUIBASE_COMMAND_TAG: "12345"
-  ###
   ### LB_BASE_DIR: REQUIRED
   ### The directory to write Liquibase output (e.g., logs, reports)
   ### LB_BASE_DIR: "/liquibase/changelogs"
@@ -50,6 +46,10 @@ globalVariables:
   ### LB_ENVIRONMENT: REQUIRED
   ### LB_ENVIRONMENT should be the environment within the pipeline to operate on (e.g., DEV, UAT, PROD)
   ### LB_ENVIRONMENT: "DEV"
+  ###
+  ### LB_TAG: REQUIRED
+  ### Should be a unique identifier and change each run (e.g., job/build number)
+  ### LB_TAG: "12345"
   ###
   ### Secrets: REQUIRED
   ### These values should be pulled from a secure vault via pipeline or Liquibase Pro extension
@@ -161,9 +161,9 @@ stages:
       #
       - type: liquibase
         command: tag
-        cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
+        cmdArgs: { tag: "${LB_TAG}" }
       #
-      # Review pending changes
+      # View pending SQL
       # SQL executed can be found in the update report
       # https://docs.liquibase.com/commands/update/update-sql.html
       #
@@ -178,25 +178,25 @@ stages:
         command: update
         cmdArgs: { label-filter: "${LB_LABELS}", report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${UPDATE_REPORT}" }
       #
-      # Test rollbacks
+      # Test rollbacks - view sql
       # Typically non-production only
       # https://docs.liquibase.com/commands/rollback/rollback-sql.html
       #
       - type: liquibase
         if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: rollback-sql
-        cmdArgs: { tag: "${LIQUIBASE_COMMAND_TAG}" }
+        cmdArgs: { tag: "${LB_TAG}" }
       #
-      # Test rollbacks
+      # Test rollbacks - rollback to tag
       # Typically non-production only
       # https://docs.liquibase.com/commands/rollback/rollback-by-tag.html
       #
       - type: liquibase
         if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: rollback
-        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${ROLLBACK_REPORT}", tag: "${LIQUIBASE_COMMAND_TAG}" }
+        cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${ROLLBACK_REPORT}", tag: "${LB_TAG}" }
       #
-      # Test rollbacks
+      # Test rollbacks - reapply changes
       # Typically non-production only
       # https://docs.liquibase.com/commands/update/update.html
       #
