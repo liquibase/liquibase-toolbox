@@ -8,12 +8,12 @@ stages:
   Default:
     actions:
       #
-      # Show Quality Checks
+      # Show Policy Checks
       #
       - type: liquibase
         command: checks show
       #
-      # Quality Checks for changelog
+      # Policy Checks for changelog
       #
       - type: liquibase
         command: checks run
@@ -29,7 +29,7 @@ stages:
       # - type: liquibase
       #   command: update
       #
-      # Quality Checks for database
+      # Policy Checks for database
       #
       # - type: liquibase
       #   command: checks run
