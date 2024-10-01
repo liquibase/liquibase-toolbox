@@ -55,9 +55,9 @@ The following files must be located in the source code repository for these pipe
 |----------|------------|-------------|
 | changelog.main.xml | Main changelog file | https://docs.liquibase.com/concepts/changelogs/home.html
 | liquibase.flowfile.yaml | Flow file | https://docs.liquibase.com/commands/flow/flow.html
-| liquibase.checks-settings.conf | Quality checks configuration | https://docs.liquibase.com/commands/quality-checks/home.html
+| liquibase.checks-settings.conf | Policy checks configuration | https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
 
-To create the initial quality checks file:
+To create the initial policy checks file:
 ```
 liquibase checks show
 ```

@@ -16,8 +16,8 @@
 ###    https://docs.liquibase.com/commands/flow/flow.html
 ###
 ### 2. liquibase.checks-settings.conf
-###    Liquibase quality checks configuration file
-###    https://docs.liquibase.com/commands/quality-checks/home.html
+###    Liquibase policy checks configuration file
+###    https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
 ###
 ### 3. changelog.main.xml
 ###    Root Liquibase changelog file
@@ -111,11 +111,11 @@ stages:
   Default:
     actions:
       #
-      # Validate database connection (future)
+      # Validate database connection
       # https://docs.liquibase.com/commands/change-tracking/connect.html
       #
-      # - type: liquibase
-      #   command: connect
+      - type: liquibase
+        command: connect
       #
       # Validate changelog
       # https://docs.liquibase.com/commands/utility/validate.html
@@ -130,16 +130,16 @@ stages:
         command: status
         cmdArgs: { label-filter: "${LB_LABELS}", verbose: "true" }
       #
-      # Show quality checks
-      # https://docs.liquibase.com/commands/quality-checks/home.html
+      # Show policy checks
+      # https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
       #
       - type: liquibase
         if: "${LB_TEST_CHECKS} == T"
         command: checks show
         cmdArgs: { check-status: "enabled" }
       #
-      # Run quality checks
-      # https://docs.liquibase.com/commands/quality-checks/home.html
+      # Run policy checks
+      # https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
       #
       - type: liquibase
         if: "${LB_TEST_CHECKS} == T"
