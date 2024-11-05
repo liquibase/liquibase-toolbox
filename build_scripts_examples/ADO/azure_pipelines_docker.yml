@@ -2,7 +2,7 @@
 ### This sample pipeline is intended as a starting point for integration between Liquibase Pro and Azure DevOps pipelines
 ### Review and update prior to use
 ###
-### Liquibase version: 4.26.0+
+### Liquibase version: 4.30.0+
 ###
 ### Liquibase sales: https://www.liquibase.com/contact-us
 ### Liquibase support: https://support.liquibase.com/knowledge
