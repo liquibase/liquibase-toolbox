@@ -27,6 +27,7 @@ globalVariables:
   ###
   ### These variables are typically set via automation tools (see pipeline examples)
   ### NOTE: Any LIQUIBASE_* variable must be set outside this flow file!
+  ### Value after ":-" in assignment is default value
   ###
   ### LIQUIBASE_SEARCH_PATH: REQUIRED
   ### https://docs.liquibase.com/parameters/search-path.html
