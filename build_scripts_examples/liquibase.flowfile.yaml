@@ -2,24 +2,20 @@
 ### This flowfile is intended to highlight capabilities of Liquibase Pro
 ### Review and update prior to use
 ###
-### Liquibase version: 4.27.0+
+### Liquibase version: 4.30.0+
 ###
 ### Liquibase sales: https://www.liquibase.com/contact-us
-### Liquibase support: https://support.liquibase.com/knowledge
+### Liquibase support: https://support.liquibase.com
 ###
 
 ### 
 ### Prior to running the following files must exist in repository
 ###
-### 1. liquibase.flowfile.yaml
-###    This flow file
-###    https://docs.liquibase.com/commands/flow/flow.html
-###
-### 2. liquibase.checks-settings.conf
+### 1. liquibase.checks-settings.conf
 ###    Liquibase policy checks configuration file
 ###    https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
 ###
-### 3. changelog.main.xml
+### 2. changelog.main.xml
 ###    Root Liquibase changelog file
 ###    https://docs.liquibase.com/concepts/changelogs/home.html
 ###
@@ -30,29 +26,21 @@
 globalVariables:
   ###
   ### These variables are typically set via automation tools (see pipeline examples)
+  ### NOTE: Any LIQUIBASE_* variable must be set outside this flow file!
+  ### Value after ":-" in assignment is default value
   ###
   ### LIQUIBASE_SEARCH_PATH: REQUIRED
+  ### https://docs.liquibase.com/parameters/search-path.html
   ### Use absolute paths when using Liquibase's Docker container
   ### LIQUIBASE_SEARCH_PATH: "/liquibase/changelog"
   ###
   ### LIQUIBASE_COMMAND_CHANGELOG_FILE: REQUIRED
   ### Root Liquibase changelog file
+  ### https://docs.liquibase.com/concepts/changelogs/home.html
   ### LIQUIBASE_COMMAND_CHANGELOG_FILE: "changelog.main.xml"
   ###
-  ### LB_BASE_DIR: REQUIRED
-  ### The directory to write Liquibase output (e.g., logs, reports)
-  ### LB_BASE_DIR: "/liquibase/changelogs"
-  ###
-  ### LB_ENVIRONMENT: REQUIRED
-  ### LB_ENVIRONMENT should be the environment within the pipeline to operate on (e.g., DEV, UAT, PROD)
-  ### LB_ENVIRONMENT: "DEV"
-  ###
-  ### LB_TAG: REQUIRED
-  ### Should be a unique identifier and change each run (e.g., job/build number)
-  ### LB_TAG: "12345"
-  ###
   ### Secrets: REQUIRED
-  ### These values should be pulled from a secure vault via pipeline or Liquibase Pro extension
+  ### These variables should be pulled from a secure vault via pipeline or Liquibase Pro extension
   ### https://docs.liquibase.com/tools-integrations/extensions/secrets-management/home.html
   ###
   ### LIQUIBASE_COMMAND_URL: "jdbc:h2:tcp://localhost:9090/mem:dev"
@@ -71,14 +59,31 @@ globalVariables:
   ###
   ### Other settings
   ### LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_OUTPUT: "issues"
+  ### LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCRIPTS_ENABLED: "true"
   ### LIQUIBASE_SHOW_BANNER: "false"
   ###
-  ### Label filters
+  ### LB_BASE_DIR: REQUIRED
+  ### The directory to write Liquibase output (e.g., logs, reports)
+  ### LB_BASE_DIR: "/liquibase/changelogs"
+  LB_BASE_DIR: "${LB_BASE_DIR:-.}"
+  ###
+  ### LB_ENVIRONMENT: REQUIRED
+  ### The environment within the pipeline to operate on (e.g., DEV, UAT, PROD)
+  ### LB_ENVIRONMENT: "DEV"
+  LB_ENVIRONMENT: "${LB_ENVIRONMENT:-DEV}"
+  ###
+  ### LB_LABELS
   ### Used to specify which changesets to deploy (defaults to all)
   ### Set LB_LABELS variable from automation tool
   ### https://docs.liquibase.com/concepts/changelogs/attributes/labels.html
   ###
   LB_LABELS: "${LB_LABELS:-null}"
+  ###
+  ### LB_TAG
+  ### Used to specify the database tag
+  ### Should be a unique identifier and change each run (e.g., job/build number)
+  ### https://docs.liquibase.com/commands/utility/tag.html
+  LB_TAG: "${LB_TAG:-LBPRO}"
   ###
   ### Files
   ###
@@ -99,16 +104,16 @@ globalVariables:
   ### Set these flags to T/F to turn Liquibase Pro features on/off
   ### These flags can also be set dynamically by an automation tool based on user input, environment, team, etc.
   ###
-  LB_SHOW_UPDATE_SQL: "F"
-  LB_TEST_CHECKS: "T"
-  LB_TEST_DRIFT: "T"
-  LB_TEST_ROLLBACKS: "T"
+  LB_SHOW_UPDATE_SQL: "${LB_SHOW_UPDATE_SQL:-F}"
+  LB_TEST_CHECKS: "${LB_TEST_CHECKS:-T}"
+  LB_TEST_DRIFT: "${LB_TEST_DRIFT:-T}"
+  LB_TEST_ROLLBACKS: "${LB_TEST_ROLLBACKS:-F}"
 
 ###
 ### Stages to execute
 ###
 stages:
-  Default:
+  Verify:
     actions:
       #
       # Validate database connection
@@ -128,7 +133,9 @@ stages:
       #
       - type: liquibase
         command: status
-        cmdArgs: { label-filter: "${LB_LABELS}", verbose: "true" }
+        cmdArgs: { label-filter: "${LB_LABELS}" }
+  PolicyChecks:
+    actions:
       #
       # Show policy checks
       # https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
@@ -145,6 +152,8 @@ stages:
         if: "${LB_TEST_CHECKS} == T"
         command: checks run
         cmdArgs: { report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${CHECKS_REPORT}", checks-scope: "changelog, database", changeset-filter: "pending" }
+  DriftDetection:
+    actions:
       #
       # Run diff and check for drift
       # Update referenceURL database type in cmdArgs (e.g., oracle, mssql, snowflake, etc.)
@@ -155,6 +164,8 @@ stages:
         command: diff
         globalArgs: { outputfile: "${LB_BASE_DIR}/${DIFF_FILE}" }
         cmdArgs: { drift-severity: "1", report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${DRIFT_REPORT}", referenceURL: "offline:snowflake?snapshot=${SNAPSHOT_FILE}", format: json }
+  Deploy:
+    actions:
       #
       # Tag database
       # https://docs.liquibase.com/commands/utility/tag.html
@@ -164,12 +175,12 @@ stages:
         cmdArgs: { tag: "${LB_TAG}" }
       #
       # View pending SQL
-      # SQL executed can be found in the update report
       # https://docs.liquibase.com/commands/update/update-sql.html
       #
       - type: liquibase
         if: "${LB_SHOW_UPDATE_SQL} == 'T'"
         command: update-sql
+        cmdArgs: { label-filter: "${LB_LABELS}" }
       #
       # Update database
       # https://docs.liquibase.com/commands/update/update.html
@@ -204,6 +215,8 @@ stages:
         if: "${LB_TEST_ROLLBACKS} == 'T' && !CONTAINS('${LB_ENVIRONMENT}', 'PROD')"
         command: update
         cmdArgs: { label-filter: "${LB_LABELS}", report-enabled: "true", report-path: "${LB_BASE_DIR}", report-name: "${UPDATE_REPORT}" }
+  PostDeploy:
+    actions:
       #
       # Create updated snapshot
       # https://docs.liquibase.com/commands/inspection/snapshot.html
