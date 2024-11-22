@@ -13,12 +13,12 @@
 ### Prior to running the following files must exist in repository:
 ###
 ### 1. liquibase.flowfile.yaml
-###    This flow file
+###    Liquibase flow file
 ###    https://docs.liquibase.com/commands/flow/flow.html
 ###
 ### 2. liquibase.checks-settings.conf
-###    Liquibase quality checks configuration file
-###    https://docs.liquibase.com/commands/quality-checks/home.html
+###    Liquibase policy checks configuration file
+###    https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
 ###
 ### 3. changelog.main.xml
 ###    Root Liquibase changelog file
