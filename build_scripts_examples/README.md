@@ -2,9 +2,10 @@
   <img src="img/liquibase.png" alt="Liquibase Logo" title="Liquibase Logo" width="324" height="72">
 </p>
 
+# 🚀 Liquibase in Automation
 This repository contains working examples of Liquibase Pro running inside various automation tools.
 
-# Included Examples
+# 🔧 Included Examples
 
 | Automation Tool |
 |----------|
@@ -17,7 +18,7 @@ This repository contains working examples of Liquibase Pro running inside variou
 | [GitLab](GitLab/gitlab-ci.yml) |
 | [Jenkins](Jenkins/Jenkinsfile) |
 
-# Methodology
+# 📋 Methodology
 Each pipeline will perform the following steps:
 1. Checkout repository
 1. Execute Liquibase flow via Docker
@@ -25,7 +26,9 @@ Each pipeline will perform the following steps:
 
 Note for some pipelines, a personal access token was used to provide read/write access to the repository (e.g., GitHub Actions). The repository and access will have to be updated prior to use in your environment.
 
-# Assumptions
+Reports and logs can be copied to a shared network location, emailed to a distribution list, or copied to an S3 bucket using our [Pro extension](https://docs.liquibase.com/liquibase-pro/remote-files/s3.html).
+
+# 💡 Assumptions
 * Pipelines must be reviewed and updated prior to use
 * Pro-only features utilized
 * Official [Docker](https://hub.docker.com/_/liquibase) container utilized
@@ -34,7 +37,7 @@ Note for some pipelines, a personal access token was used to provide read/write 
 * Required environment variables defined in configuration file or pipeline itself
 * Credentials pulled from secure location
 
-# Required Environment Variables
+# ⚠️ Required Environment Variables
 The following environment variables must be defined and passed in to the Liquibase Docker container. If running Liquibase locally, these need to be set prior to invocation.
 | Variable | Secret | Description |
 |----------|   :---:   |------------|
@@ -48,7 +51,7 @@ The following environment variables must be defined and passed in to the Liquiba
 | LB_ENVIRONMENT | | The environment the pipeline is running against (e.g., DEV, TEST, PROD). By default, diff and snapshot files are created with this variable in the name.
 | LB_TAG | | A unique identifier to tag the database. By default, the pipeline build/job number is used.
 
-# Required Files
+# ⚠️ Required Files
 The following files must be located in the source code repository for these pipelines to execute successfully.
 | File name | Description | Documentation
 |----------|------------|-------------|
@@ -61,6 +64,6 @@ To create the initial policy checks file:
 liquibase checks show
 ```
 
-# Contact Liquibase
-#### Liquibase sales: https://www.liquibase.com/contact
-#### Liquibase support: https://support.liquibase.com
+# ☎️ Contact Liquibase
+Liquibase sales: https://www.liquibase.com/contact-us<br>
+Liquibase support: https://support.liquibase.com
