@@ -38,7 +38,6 @@ trigger: none
 ###
 variables:
   LB_ENVIRONMENT: DEV
-  LB_TAG: $(Build.BuildNumber)
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.main.xml
 
 ###
@@ -72,7 +71,7 @@ stages:
 ### Liquibase should be installed where your agents run or invoked via Docker
 ###
     - script: |
-        docker run --env LIQUIBASE_SEARCH_PATH=/liquibase/changelog --env LB_BASE_DIR=/liquibase/changelog --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LB_TAG --env LB_ENVIRONMENT --rm -v $(pwd):/liquibase/changelog liquibase:latest flow --flow-file=liquibase.flowfile.yaml
+        docker run --env LIQUIBASE_SEARCH_PATH=/liquibase/changelog --env LB_BASE_DIR=/liquibase/changelog --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LB_ENVIRONMENT --rm -v $(pwd):/liquibase/changelog liquibase:latest flow --flow-file=liquibase.flowfile.yaml
 ###
 ### These values should be pulled from pipeline variables or vault
 ### https://learn.microsoft.com/en-us/azure/devops/pipelines/process/set-secret-variables?view=azure-devops&tabs=yaml%2Cbash
