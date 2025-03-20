@@ -79,12 +79,6 @@ globalVariables:
   ###
   LB_LABELS: "${LB_LABELS:-null}"
   ###
-  ### LB_TAG
-  ### Used to specify the database tag
-  ### Should be a unique identifier and change each run (e.g., job/build number)
-  ### https://docs.liquibase.com/commands/utility/tag.html
-  LB_TAG: "${LB_TAG:-LBPRO}"
-  ###
   ### Files
   ###
   DIFF_FILE: "Diff_${LB_ENVIRONMENT}.json"
@@ -174,13 +168,6 @@ stages:
         if: "status.changesetCount == 0"
         command: exit
         cmdArgs: { exitCode: "0", exitMessage: "Database is current!" }
-      #
-      # Tag database
-      # https://docs.liquibase.com/commands/utility/tag.html
-      #
-      - type: liquibase
-        command: tag
-        cmdArgs: { tag: "${LB_TAG}" }
       #
       # View pending SQL
       # https://docs.liquibase.com/commands/update/update-sql.html
