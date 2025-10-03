@@ -1,9 +1,10 @@
 ###
-### This sample pipeline is intended as a starting point for integration between Liquibase Pro and GitLab pipelines
+### This sample pipeline is intended as a starting point for integration between Liquibase Secure (formerly Liquibase Pro) and GitLab pipelines
 ### Review and update prior to use
 ###
-### Liquibase version: 4.30.0+
+### Liquibase version: 5.00.0+
 ###
+### Get Liquibase: https://www.liquibase.com/download-secure
 ### Liquibase sales: https://www.liquibase.com/contact-us
 ### Liquibase support: https://support.liquibase.com
 ### 
@@ -13,15 +14,15 @@
 ###
 ### 1. liquibase.flowfile.yaml
 ###    Liquibase flow file
-###    https://docs.liquibase.com/commands/flow/flow.html
+###    https://docs.liquibase.com/secure/user-guide-5-0/what-is-a-flow-file
 ###
 ### 2. liquibase.checks-settings.conf
 ###    Liquibase policy checks configuration file
-###    https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
+###    https://docs.liquibase.com/secure/user-guide-5-0/use-checks-settings-file
 ###
 ### 3. changelog.main.xml
 ###    Root Liquibase changelog file
-###    https://docs.liquibase.com/concepts/changelogs/home.html
+###    https://docs.liquibase.com/secure/user-guide-5-0/what-is-a-changelog
 ###
 
 ###
@@ -72,7 +73,7 @@ run-liquibase:
 ### Liquibase should be installed where your agents run or invoked via Docker
 ###
     - echo "Running Liquibase"
-    - docker run --env LIQUIBASE_SEARCH_PATH=/liquibase/changelog --env LB_BASE_DIR=/liquibase/changelog --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LB_ENVIRONMENT --rm -v $(pwd):/liquibase/changelog liquibase:latest flow --flow-file=liquibase.flowfile.yaml
+    - docker run --env LIQUIBASE_SEARCH_PATH=/liquibase/changelog --env LB_BASE_DIR=/liquibase/changelog --env LIQUIBASE_COMMAND_USERNAME --env LIQUIBASE_COMMAND_PASSWORD --env LIQUIBASE_COMMAND_URL --env LIQUIBASE_LICENSE_KEY --env LIQUIBASE_COMMAND_CHANGELOG_FILE --env LB_ENVIRONMENT --rm -v $(pwd):/liquibase/changelog liquibase/liquibase-secure:latest flow --flow-file=liquibase.flowfile.yaml
 ###
 ### Update to your project repository
 ###
