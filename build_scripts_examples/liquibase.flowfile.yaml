@@ -14,7 +14,7 @@
 ###
 ### 1. liquibase.checks-settings.conf
 ###    Liquibase policy checks configuration file
-###    https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
+###    https://docs.liquibase.com/secure/user-guide-5-0/use-checks-settings-file
 ###
 ### 2. changelog.main.xml
 ###    Root Liquibase changelog file
@@ -141,7 +141,7 @@ stages:
         cmdArgs: { check-status: "enabled" }
       #
       # Run policy checks
-      # https://docs.liquibase.com/liquibase-pro/policy-checks/home.html
+      # https://docs.liquibase.com/secure/user-guide-5-0/what-are-policy-checks
       #
       - type: liquibase
         if: "${LB_TEST_CHECKS} == T"
@@ -171,7 +171,7 @@ stages:
         cmdArgs: { exitCode: "0", exitMessage: "Database is current!" }
       #
       # View pending SQL
-      # docs.liquibase.com/reference-guide/init-update-and-rollback-commands/update-sql
+      # https://docs.liquibase.com/reference-guide/init-update-and-rollback-commands/update-sql
       #
       - type: liquibase
         if: "${LB_SHOW_UPDATE_SQL} == 'T'"
