@@ -36,7 +36,7 @@ jobs:
     - name: Running Liquibase Commands
       uses: actions/checkout@v2
     - run: |
-          curl -L https://raw.githubusercontent.com/liquibase/liquibase-toolbox/master/download_install_liquibase/download_liquibase.sh --output download_liquibase.sh
+          curl -L https://raw.githubusercontent.com/liquibase/liquibase-toolbox/main/download_install_liquibase/download_liquibase.sh --output download_liquibase.sh
           chmod +x download_liquibase.sh
           ./download_liquibase.sh
           ./liquibase/liquibase --version

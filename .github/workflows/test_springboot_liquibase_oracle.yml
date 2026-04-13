@@ -1,4 +1,4 @@
-# This workflow will build a Java Springboot project with Maven, for the following project example: https://github.com/liquibase/liquibase-toolbox/tree/master/project_examples/liquibase-springboot/springboot_liquibase_oracle 
+# This workflow will build a Java Springboot project with Maven, for the following project example: https://github.com/liquibase/liquibase-toolbox/tree/main/project_examples/liquibase-springboot/springboot_liquibase_oracle 
 
 name: Springboot CI with Maven and Spring Liquibase integration 
 
